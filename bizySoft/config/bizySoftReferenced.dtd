@@ -1,0 +1,4 @@
+
+  <!ELEMENT bizySoft                (appName, referencedConfigFile)>
+  <!ELEMENT appName                 (#PCDATA)>
+  <!ELEMENT referencedConfigFile    (#PCDATA)>

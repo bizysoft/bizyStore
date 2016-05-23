@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE bizySoft SYSTEM "file:///path/to/bizySoft/config/bizySoft.dtd">
+<!-- 
+	* This is an example of the bizySoftConfig file that is used to test bizyStore.
+	*
+	* An SQLite database and configuration has been provided as a default in the bizySoft/examples/db directory 
+	* for unit tests and examples.
+	* 
+	* The bizySoft/tests/testData directory in this distribution has database scripts for each db interface.
+	* You can run these into your database(s) to generate the tables required for the unit tests. 
+	* 
+-->
+<bizySoft>
+	<!-- 
+	* The unit tests are written to reference <appName> as a namespace.
+	* It should remain unchanged in the bizySoftConfig file for unit test execution. 
+	-->
+	<appName>unitTest</appName> 
+	<bizyStore>
+	<!-- 
+	* This is the default database provided with the distribution in the bizySoft/examples/db directory.
+	*
+	* Change the details to suit your bizyStore installation.
+	-->
+		<database>
+			<id>A</id>
+			<interface>SQLite</interface>
+			<name>/path/to/bizySoft/examples/db/bizy.db</name><!-- Change this to suit the path to the bizySoft directory -->
+			<relationships>
+				<foreignKeys>
+				<!-- 
+					The unit tests rely on this entry.
+					The uniqueKeyMembership table in this database is purposely not configured with foreign keys, but foreign key 
+					relationships can be realised by bizyStore with this config declaration.
+				-->
+					uniqueKeyMembership(memberFirstName.memberLastName.memberDob) => uniqueKeyMember(firstName.lastName.dob);
+				</foreignKeys>
+			</relationships>
+			<pdoOptions>
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION;
+				PDO::ATTR_EMULATE_PREPARES => FALSE
+			</pdoOptions>
+		</database>
+	<!--
+		* The following are examples of configuration for other databases that are supported.
+		* 
+		* Note that the <relationships> tag contains foreign key declarations that the unit tests rely on. It should be included 
+		* for each database that you want to do unit tests on.
+		* 
+		* Change the details to suit your database(s). The <id></id> should be unique in this file.
+	-->
+	<!--  
+		<database>
+			<id>B</id>
+			<interface>MySQL</interface>
+			<host>your MySql host name or IP address</host>
+			<name>your MySQL databse name</name>
+			<user>your MySQL databse user</user>
+			<password>your password for user</password>
+				<relationships>
+					<foreignKeys>
+						uniqueKeyMembership(memberFirstName.memberLastName.memberDob) => uniqueKeyMember(firstName.lastName.dob);
+					</foreignKeys>
+				</relationships>
+			<pdoOptions>
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION;
+				PDO::ATTR_EMULATE_PREPARES => FALSE
+			</pdoOptions>
+		</database>
+	-->
+	</bizyStore>
+</bizySoft>

@@ -1,0 +1,84 @@
+<!--
+ ***************************************************************************************
+ * If you find our software helpful, the best way to contribute is to hire us to work 
+ * for you. Details at www.bizysoft.com.au
+ *
+ * author Chris Maude, chris@bizysoft.com.au
+ * copyright Copyright (c) 2016, bizySoft
+ * license http://opensource.org/licenses/gpl-license GPL-3.0 or later
+ *
+ ***************************************************************************************
+ *
+ * memberEntry.html. An example of a web form used to create a Member in a database
+ *
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+</head>
+<body>
+    <h1>Please enter your member details.</h1>
+    <!-- This is our form. The values for the input elements with name="..." within 
+         the form will be sent to the action url when the form is posted to the server via 
+         the submit button. 
+         
+         The action url is memberCreateRaw.php so the form inputs will appear 
+         there as post data in the PHP $_POST associative array variable -->
+    <form method="post" action="memberCreateRaw.php">
+        <table>
+            <tr>
+                <td>First Name&nbsp;</td>
+                <td><input type="text" name="firstName"
+                    id="firstName" value="" maxlength="40" /></td>
+                <td>Last Name</td>
+                <td><input type="text" name="lastName"
+                    id="lastName" value="" maxlength="40" /></td>
+            </tr>
+            <tr>
+                <td>Address</td>
+                <td><input type="text" name="address" id="address"
+                    value="" maxlength="70" /></td>
+                <td>Suburb</td>
+                <td><input type="text" name="suburb" id="suburb"
+                    value="" maxlength="30" /></td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td><select name="state" id="state">
+                        <option value="Vic">Vic</option>
+                        <option value="NSW">NSW</option>
+                        <option value="SA">SA</option>
+                        <option value="Tas">Tas</option>
+                        <option value="Qld">Qld</option>
+                        <option value="WA">WA</option>
+                        <option value="NT">NT</option>
+                </select></td>
+                <td>Postcode</td>
+                <td><input type="text" name="postCode"
+                    id="postCode" value="" /></td>
+            </tr>
+            <tr>
+                <td>DOB (yyyy-mm-dd)&nbsp;</td>
+                <td><input type="text" name="dob" id="dob" value="" /></td>
+                <td>Gender</td>
+                <td><select name="gender" id="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><input type="text" name="email" id="email"
+                    maxlength="70" value="" /></td>
+                <td>Phone No</td>
+                <td><input type="text" name="phoneNo" id="phoneNo"
+                    value="" /></td>
+            </tr>
+            <tr>
+                <td colspan="4"><input id="submit" type="submit" /></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

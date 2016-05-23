@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit 
+	backupStaticAttributes="false" 
+	bootstrap = "phpBootstrap.php"
+	cacheTokens="false"
+	colors="false" 
+	convertErrorsToExceptions="false"
+	convertNoticesToExceptions="false" 
+	convertWarningsToExceptions="false"
+	forceCoversAnnotation="false" 
+	mapTestClassNameToCoveredClassName="false"
+	printerClass="PHPUnit_TextUI_ResultPrinter" 
+	processIsolation="false"
+	stopOnError="false" 
+	stopOnFailure="false" 
+	stopOnIncomplete="false"
+	stopOnSkipped="false" 
+	testSuiteLoaderFile="phpunit/src/Runner/StandardTestSuiteLoader.php"
+	verbose="false">
+	<testsuites>
+		<testsuite name="bizyStoreTests">
+			<directory>.</directory>
+		</testsuite>
+	</testsuites>
+<!-- 
+	<logging>
+		<log type="coverage-html" target="/path/to/codeCoverageDirectory" charset="UTF-8"
+			yui="true" highlight="true" colors="true" lowUpperBound="50"
+			highLowerBound="80" />
+	</logging>
+-->
+	<php>
+		<server name="SERVER_NAME" value="unitTest" /> <!-- load the bizySoftConfig_unitTest.xml file -->
+		<ini name="date.timezone" value="Australia/Melbourne" />
+		<ini name="log_errors" value="on" />
+		<ini name="include_path" value="/path/to/bizySoft" />
+		<ini name="error_reporting" value="E_ALL" />
+		<ini name="error_log" value="/path/to/bizySoft/tests/unitTest.log" />
+	</php>
+</phpunit>

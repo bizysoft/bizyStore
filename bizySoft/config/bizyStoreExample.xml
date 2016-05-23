@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE bizySoft SYSTEM "file:///path/to/bizySoft/config/bizySoft.dtd">
+<!-- 
+	* This is the bizySoftConfig file that is used by the bizyStore examples. In a run time environment 
+	* this file would normally be named bizySoftConfig.xml or yourDomainName.xml. (e.g. yourdomain.com.xml).
+	*
+	* If you have installed the bizySoft directory into your hosted environment's DOCUMENT_ROOT you should use a 
+	* referenced config file to refer to this file in your website's 'account home directory'. (see bizyStoreExampleReferenced.xml)
+	* 
+	* It uses the SQLite database provided with the distribution in the bizySoft/examples/db directory.  
+	*
+	* You should change the above dtd to suit your installation. You can then change the config to suit your database, 
+	* leaving the <appName> as is.
+-->
+<bizySoft>
+<!-- The examples are written to reference <appName> as a namespace. It should remain unchanged . -->
+	<appName>bizyStoreExample</appName> 
+	<bizyStore>
+		<database>
+			<id>A</id>
+			<interface>SQLite</interface>
+			<name>/path/to/bizySoft/examples/db/bizy.db</name> <!-- Change this to suit the path to bizySoft -->
+			<pdoOptions>
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION;
+				PDO::ATTR_EMULATE_PREPARES => FALSE
+			</pdoOptions>
+		</database>
+	</bizyStore>
+</bizySoft>

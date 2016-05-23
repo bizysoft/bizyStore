@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE bizySoft SYSTEM "file:///path/to/bizySoft/config/bizySoftReferenced.dtd">
+<!-- 
+	* This is the referenced bizySoftConfig file that can be used for shared environments where the PHP include_path is difficult
+	* to change. You should change the above dtd and the <referencedConfigFile> to suit your installation. In a run time environment 
+	* this file would normally be named bizySoftConfig.xml or yourDomainName.xml. (e.g. yourdomain.com.xml).
+	*
+	* In shared environments, PHP is usually configured with an include_path containing "." which in most cases is your PHP DOCUMENT_ROOT 
+	* (usually the public_html or www directory). The webserver only has access to files under your DOCUMENT_ROOT. 
+	
+	* Note that "." actually means the directory that the PHP script you call resides in, so access to the bizySoft directory needs 
+	* to be from PHP files directly in your DOCUMENT_ROOT (the disadvantage to using this technique).
+	*
+	* Your DOCUMENT_ROOT resides in your website's 'account home directory'. The webserver does not have access to this directory, 
+	* so files cannot be served from there. To keep your config safe, it's recommended to put your config file(s) somewhere under 
+	* your 'account home directory' but outside your DOCUMENT_ROOT, then you can load it with the <referencedConfigFile> tag.
+	*
+	* This makes it possible to install the bizySoft directory into your DOCUMENT_ROOT, but load your sensitive XML 
+	* config information from a file that cannot be served by your webserver.
+	*
+	* This file will load the <referencedConfigFile> file which should contain all your database config.
+-->
+<bizySoft>
+<!-- The examples are written to reference the <appName> as a namespace. It should remain unchanged . -->
+	<appName>bizyStoreExample</appName> 
+<!-- You should change this to suit your environment. In a shared hosting environment, this refers to bizyStoreExample.xml
+     under your 'account home directory' which would contain the bizyStore database config. -->
+	<referencedConfigFile>/path/to/bizyStoreExample.xml</referencedConfigFile>
+</bizySoft>

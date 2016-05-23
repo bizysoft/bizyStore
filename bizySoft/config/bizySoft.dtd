@@ -1,0 +1,23 @@
+
+  <!ELEMENT bizySoft            (appName, bizyStore?, options?)>
+  <!ELEMENT appName             (#PCDATA)>
+  <!ELEMENT bizyStore           (database+, options?)>
+  <!ELEMENT options             (#PCDATA)>
+  <!ELEMENT database            (id, interface, host?, port?, socket?, name, schema?, user?, password?, charset?, tables?, relationships?, pdoOptions?, pdoPrepareOptions?, modelPrepareOptions?)>
+  <!ELEMENT relationships       (foreignKeys?, recursive?)>
+  <!ELEMENT id                  (#PCDATA)>
+  <!ELEMENT interface           (#PCDATA)>
+  <!ELEMENT host                (#PCDATA)>
+  <!ELEMENT port                (#PCDATA)>
+  <!ELEMENT socket              (#PCDATA)>
+  <!ELEMENT name                (#PCDATA)>
+  <!ELEMENT schema              (#PCDATA)>
+  <!ELEMENT user                (#PCDATA)>
+  <!ELEMENT password            (#PCDATA)>
+  <!ELEMENT charset             (#PCDATA)>
+  <!ELEMENT tables              (#PCDATA)>
+  <!ELEMENT recursive           (#PCDATA)>
+  <!ELEMENT foreignKeys         (#PCDATA)>
+  <!ELEMENT pdoOptions          (#PCDATA)>
+  <!ELEMENT pdoPrepareOptions   (#PCDATA)>
+  <!ELEMENT modelPrepareOptions (#PCDATA)>
