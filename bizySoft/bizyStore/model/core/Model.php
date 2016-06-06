@@ -21,7 +21,7 @@ use bizySoft\bizyStore\model\statements\UpdatePreparedStatement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license http://www.bizysoft.com.au/LICENSE.html GNU GPL. See the LICENSE file with this distribution.
+ * @license  See the LICENSE file with this distribution.
  */
 abstract class Model implements ModelOptions, ModelI, SchemaI
 {

@@ -64,7 +64,7 @@ If you find our software helpful in any way, the best way to contribute is to hi
 
 License
 ------------
-Our software is free for you to use under the license terms. See LICENSE.html with the distribution.
+Our software is free for you to use under the license terms. See the LICENSE file with the distribution.
 
 Contact:
 --------
