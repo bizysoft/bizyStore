@@ -12,9 +12,8 @@ use bizySoft\bizyStore\model\statements\FindPreparedStatement;
 use bizySoft\bizyStore\model\statements\UpdatePreparedStatement;
 use bizySoft\bizyStore\model\statements\DeletePreparedStatement;
 use bizySoft\bizyStore\model\statements\PreparedStatementBuilder;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\DBManager;
-use bizySoft\tests\services\TestLogger;
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
+use bizySoft\bizyStore\app\unitTest\Member;
 
 /**
  * Test the internals of Model statements are working correctly via the CRUD statement classes.
@@ -24,7 +23,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelStatementTestCase extends ModelTestCase
 {
@@ -32,21 +31,23 @@ class ModelStatementTestCase extends ModelTestCase
 	{
 		$values = '(firstName,lastName) VALUES (:firstName,:lastName)';
 		$pgValues = '("firstName","lastName") VALUES (:firstName,:lastName)';
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
 		$expected = array(
 			'SQLite' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $values,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $values,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $values
+				"$modelNamespace\\Member" => $values,
+				"$modelNamespace\\UniqueKeyMember" => $values,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $values
 			),
 			'MySQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $values,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $values,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $values
+				"$modelNamespace\\Member" => $values,
+				"$modelNamespace\\UniqueKeyMember" => $values,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $values
 			),
 			'PgSQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $pgValues,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $pgValues,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $pgValues
+				"$modelNamespace\\Member" => $pgValues,
+				"$modelNamespace\\UniqueKeyMember" => $pgValues,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $pgValues
 			)
 		);
 		
@@ -57,10 +58,12 @@ class ModelStatementTestCase extends ModelTestCase
 					"lastName" => "Hill" 
 			);
 			
+			$config = self::getTestcaseConfig();
+				
 			$dbId = $db->getDBId();
-			$dbConfig = DBManager::getDBConfig($dbId);
-			$pdoPrepareOptions = isset($dbConfig[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] : null;
-			$modelPrepareOptions = isset($dbConfig[BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG] : null;
+			$dbConfig = $config->getDBConfig($dbId);
+			$pdoPrepareOptions = isset($dbConfig[self::PDO_PREPARE_OPTIONS_TAG]) ? $dbConfig[self::PDO_PREPARE_OPTIONS_TAG] : null;
+			$modelPrepareOptions = isset($dbConfig[self::MODEL_PREPARE_OPTIONS_TAG]) ? $dbConfig[self::MODEL_PREPARE_OPTIONS_TAG] : null;
 			$jackHill = new $model($jackHillProps, $db);
 			$statement = new CreatePreparedStatement($jackHill);
 			// Test the options are set correctly
@@ -70,21 +73,21 @@ class ModelStatementTestCase extends ModelTestCase
 			);
 			if ($pdoPrepareOptions)
 			{
-				$expectedOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] = $pdoPrepareOptions;
+				$expectedOptions[self::PDO_PREPARE_OPTIONS_TAG] = $pdoPrepareOptions;
 			}
 			if ($modelPrepareOptions)
 			{
-				if (isset($modelPrepareOptions[BizyStoreOptions::OPTION_CACHE]))
+				if (isset($modelPrepareOptions[self::OPTION_CACHE]))
 				{
-					$cache = $modelPrepareOptions[BizyStoreOptions::OPTION_CACHE];
+					$cache = $modelPrepareOptions[self::OPTION_CACHE];
 					if ($cache)
 					{
-						$expectedOptions[BizyStoreOptions::OPTION_CACHE] = $cache;
+						$expectedOptions[self::OPTION_CACHE] = $cache;
 					}
 				}
 			}
 			$this->assertEquals($expectedOptions, $statementOptions);
-			$dbInterface = $dbConfig[BizyStoreOptions::DB_INTERFACE_TAG];
+			$dbInterface = $dbConfig[self::DB_INTERFACE_TAG];
 			$query = $statement->getQuery();
 			// Check if the statement key is constructed from our properties
 			$expectedQuery = "INSERT INTO " . $db->qualifyEntity($jackHill->getTableName()) . " " . $expected[$dbInterface][$model];
@@ -107,21 +110,23 @@ class ModelStatementTestCase extends ModelTestCase
 		$unsequencedWhere = 'WHERE email = :email AND firstName = :firstName AND lastName = :lastName';
 		$sequencedPgWhere = 'WHERE "email" = :email AND "firstName" = :firstName AND "id" = :id AND "lastName" = :lastName';
 		$unsequencedPgWhere = 'WHERE "email" = :email AND "firstName" = :firstName AND "lastName" = :lastName';
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
 		$expected = array(
 			'SQLite' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedWhere,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unsequencedWhere,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unsequencedWhere
+				"$modelNamespace\\Member" => $sequencedWhere,
+				"$modelNamespace\\UniqueKeyMember" => $unsequencedWhere,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unsequencedWhere
 			),
 			'MySQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedWhere,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unsequencedWhere,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unsequencedWhere
+				"$modelNamespace\\Member" => $sequencedWhere,
+				"$modelNamespace\\UniqueKeyMember" => $unsequencedWhere,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unsequencedWhere
 			),
 			'PgSQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedPgWhere,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unsequencedPgWhere,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unsequencedPgWhere
+				"$modelNamespace\\Member" => $sequencedPgWhere,
+				"$modelNamespace\\UniqueKeyMember" => $unsequencedPgWhere,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unsequencedPgWhere
 			)
 		);
 		
@@ -133,13 +138,15 @@ class ModelStatementTestCase extends ModelTestCase
 					"email" => "jack@thehills.com"
 			);
 			
+			$config = self::getTestcaseConfig();
+				
 			$jackHill = new $model($jackHillProps, $db);
 			$jackHill->create();
 			
 			$statement = new DeletePreparedStatement($jackHill);
 			$dbId = $db->getDBId();
-			$dbConfig = DBManager::getDBConfig($dbId);
-			$dbInterface = $dbConfig[BizyStoreOptions::DB_INTERFACE_TAG];
+			$dbConfig = $config->getDBConfig($dbId);
+			$dbInterface = $dbConfig[self::DB_INTERFACE_TAG];
 			$query = $statement->getQuery();
 			// Check if the statement key is constructed from our properties
 			$expectedQuery = "DELETE FROM " . $db->qualifyEntity($jackHill->getTableName()) . " " . $expected[$dbInterface][$model];
@@ -155,28 +162,29 @@ class ModelStatementTestCase extends ModelTestCase
 		});
 	}
 	
-	
 	public function testModelUpdateStatement()
 	{
 		$sequencedSet = 'SET email = :_email,firstName = :_firstName WHERE email = :email AND firstName = :firstName AND id = :id AND lastName = :lastName';
 		$unSequencedSet = 'SET email = :_email,firstName = :_firstName WHERE email = :email AND firstName = :firstName AND lastName = :lastName';
 		$sequencedPgSet = 'SET "email" = :_email,"firstName" = :_firstName WHERE "email" = :email AND "firstName" = :firstName AND "id" = :id AND "lastName" = :lastName';
 		$unsqequencedPgSet = 'SET "email" = :_email,"firstName" = :_firstName WHERE "email" = :email AND "firstName" = :firstName AND "lastName" = :lastName';
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
 		$expected = array(
 			'SQLite' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedSet,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unSequencedSet,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unSequencedSet
+				"$modelNamespace\\Member" => $sequencedSet,
+				"$modelNamespace\\UniqueKeyMember" => $unSequencedSet,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unSequencedSet
 			), 
 			'MySQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedSet,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unSequencedSet,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unSequencedSet
+				"$modelNamespace\\Member" => $sequencedSet,
+				"$modelNamespace\\UniqueKeyMember" => $unSequencedSet,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unSequencedSet
 			), 
 			'PgSQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $sequencedPgSet,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $unsqequencedPgSet,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $unsqequencedPgSet
+				"$modelNamespace\\Member" => $sequencedPgSet,
+				"$modelNamespace\\UniqueKeyMember" => $unsqequencedPgSet,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $unsqequencedPgSet
 			)
 		);
 		
@@ -194,13 +202,15 @@ class ModelStatementTestCase extends ModelTestCase
 					"email" => "jill@thehills.com" 
 			);
 			
+			$config = self::getTestcaseConfig();
+				
 			$jack = new $model($jackProperties, $db);
 			$jack->create();
 			
 			$statement = new UpdatePreparedStatement($jack, $jillProperties);
 			$dbId = $db->getDBId();
-			$dbConfig = DBManager::getDBConfig($dbId);
-			$dbInterface = $dbConfig[BizyStoreOptions::DB_INTERFACE_TAG];
+			$dbConfig = $config->getDBConfig($dbId);
+			$dbInterface = $dbConfig[self::DB_INTERFACE_TAG];
 			$query = $statement->getQuery();
 			$expectedQuery = "UPDATE " . $db->qualifyEntity($jack->getTableName()) . " " . $expected[$dbInterface][$model];
 			$this->assertEquals($expectedQuery, $query);
@@ -227,21 +237,23 @@ class ModelStatementTestCase extends ModelTestCase
 	{
 		$where = 'WHERE firstName = :firstName AND lastName = :lastName';
 		$pgWhere = 'WHERE "firstName" = :firstName AND "lastName" = :lastName';
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
 		$expected = array(
 			'SQLite' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $where,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $where,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $where
+				"$modelNamespace\\Member" => $where,
+				"$modelNamespace\\UniqueKeyMember" => $where,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $where
 			),
 			'MySQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $where,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' => $where,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $where
+				"$modelNamespace\\Member" => $where,
+				"$modelNamespace\\UniqueKeyMember" => $where,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $where
 			),
 			'PgSQL' => array(
-				'bizySoft\bizyStore\model\unitTest\Member' => $pgWhere,
-				'bizySoft\bizyStore\model\unitTest\UniqueKeyMember' =>  $pgWhere,
-				'bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember' => $pgWhere
+				"$modelNamespace\\Member" => $pgWhere,
+				"$modelNamespace\\UniqueKeyMember" =>  $pgWhere,
+				"$modelNamespace\\OverlappedUniqueKeyMember" => $pgWhere
 			)
 		);
 		
@@ -251,6 +263,8 @@ class ModelStatementTestCase extends ModelTestCase
 					"firstName" => "Jack",
 					"lastName" => "Hill" 
 			);
+			$config = self::getTestcaseConfig();
+				
 			/*
 			 * Create Jack in the $db
 			 */
@@ -261,8 +275,8 @@ class ModelStatementTestCase extends ModelTestCase
 			$statement = new FindPreparedStatement($jack);
 			
 			$dbId = $db->getDBId();
-			$dbConfig = DBManager::getDBConfig($dbId);
-			$dbInterface = $dbConfig[BizyStoreOptions::DB_INTERFACE_TAG];
+			$dbConfig = $config->getDBConfig($dbId);
+			$dbInterface = $dbConfig[self::DB_INTERFACE_TAG];
 			$query = $statement->getQuery();
 			$expectedQuery = "SELECT * FROM " . $db->qualifyEntity($jack->getTableName()) . " " . $expected[$dbInterface][$model];
 			$this->assertEquals($expectedQuery, $query);
@@ -407,7 +421,7 @@ class ModelStatementTestCase extends ModelTestCase
 		});
 	}
 	
-	public function testModelCreateStatementWithNullProperties()
+	public function testModelCreateStatementWithNullProperty()
 	{
 		$this->runTransactionOnAllDatabasesAndTables(function ($db, $outerTxn, $model) 
 		{
@@ -449,6 +463,34 @@ class ModelStatementTestCase extends ModelTestCase
 			$this->assertTrue($pdoStatement instanceof PDOStatement);
 			$pdoQuery = $pdoStatement->queryString;
 			$this->assertEquals($pdoQuery, $statementQuery);
+		});
+	}
+	
+	public function testModelCreateWithEmptyProperties()
+	{
+		$this->runTransactionOnAllDatabases(function ($db, $outerTxn)
+		{
+			/*
+			 * We should be able to create an empty database record on a Member
+			 * Model as the member table has nullable columns.
+			 */
+			try
+			{
+				$empty = new Member(null, $db);
+				$empty->create();
+				/*
+				 * Get the sequenced properties.
+				 */
+				$keyProperties = $empty->getKeyProperties();
+				/*
+				 * Specifically test the id field for Member.
+				 */
+				$this->assertTrue($keyProperties["id"] !== null);
+			}
+			catch (ModelException $e)
+			{
+				$this->fail("Can't create empty model. " . $e->getMessage());
+			}
 		});
 	}
 	
@@ -624,19 +666,19 @@ class ModelStatementTestCase extends ModelTestCase
 	 */
 	public function testFindPerformance()
 	{
-		TestLogger::startTimer("performance populate");
+		$this->logger->startTimer("performance populate");
 		$iterations = 1000;
 		$this->runTransactionOnAllDatabases(function ($db, $outerTxn)  use($iterations) 
 		{
 			$this->populateBulkDB($db, $iterations);
 		});
-		TestLogger::stopTimer("performance populate");
+		$this->logger->stopTimer("performance populate");
 		
 		$formData = $this->formData->getJackFormData();
-		TestLogger::startTimer("performance fetch");
+		$this->logger->startTimer("performance fetch");
 		$this->runTransactionOnAllDatabasesAndTables(function ($db, $outerTxn, $className) use($formData, $iterations) 
 		{
-			TestLogger::log("Running $iterations $className's on database " . $db->getDBId());
+			$this->logger->log("Running $iterations $className's on database " . $db->getDBId());
 			/*
 			 * Specify the where clause. 
 			 * All database tables are populated with Jack as the firstName. Using this property in where clause will bring back
@@ -654,9 +696,9 @@ class ModelStatementTestCase extends ModelTestCase
 			 * Test the find method on our Model object
 			 */
 			$keyOption = array(PreparedStatement::OPTION_PREPARE_KEY => "find key for $className");
-			TestLogger::startTimer("$className model prepare");
+			$this->logger->startTimer("$className model prepare");
 			$members = $model->find($keyOption);
-			$modelElapsed = TestLogger::stopTimer("$className model prepare");
+			$modelElapsed = $this->logger->stopTimer("$className model prepare");
 			$this->assertEquals(count($members), $iterations);
 			$this->assertTrue(reset($members) instanceof Model);
 			/*
@@ -679,20 +721,20 @@ class ModelStatementTestCase extends ModelTestCase
 			$query = $builder->buildModelSelectStatement($tableName, $properties);
 			$query = $builder->translate($query, $properties);
 			$queryStatement = new QueryPreparedStatement($db, $query, $properties, $queryOptions);
-			TestLogger::startTimer("$className query model prepare");
+			$this->logger->startTimer("$className query model prepare");
 			$members = $queryStatement->objectSet();
-			$queryElapsed = TestLogger::stopTimer("$className query model prepare");
+			$queryElapsed = $this->logger->stopTimer("$className query model prepare");
 			$this->assertEquals(count($members), $iterations);
 			/*
 			 * Do again to eliminate timing issues for prepares.
 			 */
-			TestLogger::startTimer("$className model fetch stable");
+			$this->logger->startTimer("$className model fetch stable");
 			$members = $model->find($keyOption);
-			$modelStableElapsed = TestLogger::stopTimer("$className model fetch stable");
+			$modelStableElapsed = $this->logger->stopTimer("$className model fetch stable");
 			$this->assertEquals(count($members), $iterations);
-			TestLogger::startTimer("$className query model fetch stable");
+			$this->logger->startTimer("$className query model fetch stable");
 			$members = $queryStatement->objectSet();
-			$queryStableElapsed = TestLogger::stopTimer("$className query model fetch stable");
+			$queryStableElapsed = $this->logger->stopTimer("$className query model fetch stable");
 			/*
 			 * Model find() should be significantly faster than a QueryPreparedStatement objectSet();
 			 */	
@@ -700,16 +742,16 @@ class ModelStatementTestCase extends ModelTestCase
 			/*
 			 * Do an assocSet() and compare with Model
 			 */
-			TestLogger::startTimer("$className query assoc fetch");
+			$this->logger->startTimer("$className query assoc fetch");
 			$members = $queryStatement->assocSet();
-			$queryAssocElapsed = TestLogger::stopTimer("$className query assoc fetch");
+			$queryAssocElapsed = $this->logger->stopTimer("$className query assoc fetch");
 			/*
 			 * assocSet() should be significantly faster than a Model find();
 			 */
 			$this->assertTrue($modelStableElapsed > $queryAssocElapsed);
 				
 		});
-		TestLogger::stopTimer("performance fetch");
+		$this->logger->stopTimer("performance fetch");
 	}
 	
 	public function testFindStatementWithBadProperties()
@@ -775,7 +817,7 @@ class ModelStatementTestCase extends ModelTestCase
 			}
 			catch (ModelException $e)
 			{
-				TestLogger::log("Exception OK for test");
+				$this->logger->log("Exception OK for test");
 				// bump the assertionCount for another check passed.
 				$this->assertTrue(true);
 			}
@@ -791,7 +833,7 @@ class ModelStatementTestCase extends ModelTestCase
 			}
 			catch (ModelException $e)
 			{
-				TestLogger::log("Exception OK for test");
+				$this->logger->log("Exception OK for test");
 				// bump the assertionCount for another check passed.
 				$this->assertTrue(true);
 			}

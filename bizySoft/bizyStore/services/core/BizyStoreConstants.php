@@ -1,7 +1,7 @@
 <?php
 namespace bizySoft\bizyStore\services\core;
 
-use bizySoft\common\AppOptions;
+use bizySoft\common\AppConstants;
 
 /**
  * Specific XML tags and config array keys used by bizyStore.
@@ -11,10 +11,10 @@ use bizySoft\common\AppOptions;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  * 
  */
-interface BizyStoreOptions extends AppOptions
+interface BizyStoreConstants extends AppConstants
 {
 	/*
 	 * XML/array keys for config items
@@ -38,27 +38,27 @@ interface BizyStoreOptions extends AppOptions
 	const PDO_PREPARE_OPTIONS_TAG = "pdoPrepareOptions";
 	const REL_FOREIGN_KEYS_TAG = "foreignKeys";
 	const REL_RECURSIVE_TAG = "recursive";
-	
+	const REST_TAG = "rest";
+	const REST_SERVICES_TAG = "services";
+
 	/*
 	 * Valid option names
 	 */
 	const OPTION_CLEAN_UP = "cleanUp";
 	const OPTION_PREPARE_PREFIX = "preparePrefix";
 	/*
-	 * Valid clean up option values
-	 */
-	const OPTION_COMMIT = "commit";
-	const OPTION_ROLLBACK = "rollback";
-	/*
 	 * Valid modelPrepareOption names
 	 */
 	const OPTION_CACHE = "cache";
-	
-
 	/*
 	 * Derived BizyStoreConfig items that don't appear in the bizySoftConfig file
 	 */
+	const BIZYSTORE_MODEL_BASE_DIR	= "bizyStoreModelBaseDir";
 	const BIZYSTORE_MODEL_DIR = "bizyStoreModelDir";
 	const BIZYSTORE_MODEL_NAMESPACE = "bizyStoreModelNamespace";
+	const BIZYSTORE_CONFIG_BASE_DIR	= "bizyStoreConfigBaseDir";
+	const BIZYSTORE_CONFIG_DIR = "bizyStoreConfigDir";
+	const BIZYSTORE_CONFIG_NAMESPACE = "bizyStoreConfigNamespace";
+	const BIZYSTORE_CONFIG_CLASS = "bizyStoreConfigClass";
 }
 ?>

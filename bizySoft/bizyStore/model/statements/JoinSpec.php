@@ -40,9 +40,8 @@ namespace bizySoft\bizyStore\model\statements;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-
 class JoinSpec
 {
 	/**
@@ -61,7 +60,7 @@ class JoinSpec
 	 * The column names of the association or junction table specified by the 
 	 * constructor joinSpec string.
 	 * 
-	 * @var unknown_type
+	 * @var array
 	 */
 	public $assocColumns = array();
 	/*
@@ -124,7 +123,6 @@ class JoinSpec
 	 * 
 	 * @param string $joinSpec
 	 * @param boolean $first
-	 * @return array
 	 */
 	public function explode($joinSpec)
 	{

@@ -16,7 +16,7 @@ use bizySoft\bizyStore\model\core\Model;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class FindPreparedStatement extends CRUDPreparedStatement
 {

@@ -70,9 +70,9 @@ namespace bizySoft\bizyStore\model\core;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class OptimisticWrite implements OptimisticOptions
+abstract class OptimisticWrite implements ModelConstants
 {
 	/**
 	 * This is the Model object that requires a write action to be invoked on it.
@@ -125,6 +125,8 @@ abstract class OptimisticWrite implements OptimisticOptions
 			$mode = isset($this->options[self::OPTION_LOCK_MODE]) ? $this->options[self::OPTION_LOCK_MODE] : null;
 			/*
 			 * Default to LOCK_MODE_LOCAL if none specified.
+			 * LOCK_MODE_DATABASE does not require processing, a database column default or trigger should set this value
+			 * on row modification.
 			 */
 			$lockMode = $mode ? $mode : self::LOCK_MODE_LOCAL;
 			if ($lockMode == self::LOCK_MODE_LOCAL)
@@ -143,7 +145,7 @@ abstract class OptimisticWrite implements OptimisticOptions
 			}
 		}
 		/*
-		 *  We've set up the versioning mechanism, now execute the statement. This will wait for any other 
+		 *  We've set up the versioning mechanism (if specified), now execute the statement. This will wait for any external
 		 *  locks to be released before locking the row(s)/table/database depending on the vendors implementation.
 		 */
 		$result = $this->executeStatement();
@@ -172,6 +174,9 @@ abstract class OptimisticWrite implements OptimisticOptions
 				$db = $modelToUpdate->getDB();
 				if ($db->getTransaction()->isUniqueUpdatePolicy() || $oldLockValue != null)
 				{
+					/*
+					 * This indicates to the calling code that the transaction should be rolled back.
+					 */
 					throw new ModelException(__METHOD__ . ": Writes to multiple Model's are not allowed in this transaction.");
 				}
 			}

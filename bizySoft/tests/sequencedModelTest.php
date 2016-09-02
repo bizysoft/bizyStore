@@ -1,9 +1,7 @@
 <?php
 namespace bizySoft\tests;
 
-use bizySoft\bizyStore\model\unitTest\MultiSequencedMember;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\app\unitTest\MultiSequencedMember;
 use bizySoft\common\ArrayOptionHandler;
 
 /**
@@ -15,22 +13,24 @@ use bizySoft\common\ArrayOptionHandler;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class SequencedModelTestCase extends ModelTestCase
 {
 	public function testSequenceModel()
 	{
+		$config = self::getTestcaseConfig();
+		
 		$multiSequencedInterfaces = array("PgSQL" => "PgSQL");
 		
-		$this->runTransactionOnAllDatabases(function ($db, $outerTxn) use ($multiSequencedInterfaces)
+		$this->runTransactionOnAllDatabases(function ($db, $outerTxn) use ($multiSequencedInterfaces, $config)
 		{
 			$formData = $this->formData->getJackFormData();
 			
 			$dbId = $db->getDBId();
-			$dbConfig = DBManager::getDBConfig($dbId);
+			$dbConfig = $config->getDBConfig($dbId);
 			$optionHandler = new ArrayOptionHandler($dbConfig);
-			$interfaceOption = $optionHandler->getOption(BizyStoreOptions::DB_INTERFACE_TAG);
+			$interfaceOption = $optionHandler->getOption(self::DB_INTERFACE_TAG);
 			$interfaceValue = $interfaceOption->value;
 			/*
 			 * test the interfaces that have multiSequencedMember tables to test

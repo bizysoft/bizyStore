@@ -12,7 +12,7 @@ use bizySoft\bizyStore\model\statements\Statement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class StatementIterator implements Iterator
 {
@@ -24,7 +24,13 @@ abstract class StatementIterator implements Iterator
 	 */
 	protected $statement = null;
 	
+	/**
+	 * Properties for the iterator query.
+	 * 
+	 * @var array
+	 */
 	private $properties = array();
+	
 	/**
 	 * The row data retrieved from the statement.
 	 *
@@ -67,7 +73,7 @@ abstract class StatementIterator implements Iterator
 	/**
 	 * Is the iterator at a valid position.
 	 *
-	 * @see Iterator::valid()
+	 * @return boolean
 	 */
 	public function valid()
 	{
@@ -103,6 +109,8 @@ abstract class StatementIterator implements Iterator
 	
 	/**
 	 * Fetch the next value from the statement and adjust the position.
+	 * 
+	 * @return mixed depends on implementation.
 	 */
 	public final function next()
 	{
@@ -121,7 +129,7 @@ abstract class StatementIterator implements Iterator
 	/**
 	 * Get the current count of rows fetched.
 	 *
-	 * @return number
+	 * @return integer
 	 */
 	public final function count()
 	{

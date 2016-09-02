@@ -10,10 +10,10 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  *         
  */
-interface AppOptions
+interface AppConstants
 {
 	/**
 	 * The root XML tag for bizySoft AppConfig.
@@ -21,12 +21,6 @@ interface AppOptions
 	 * @var string
 	 */
 	const BIZYSOFT_TAG = "bizySoft";
-	
-	/**
-	 * The xml tag for the name of your application in AppConfig.
-	 *
-	 * @var string
-	 */
 	const APP_NAME_TAG = "appName";
 	/**
 	 * This is a field name for the AppConfig file name that has been loaded.
@@ -52,7 +46,7 @@ interface AppOptions
 	/**
 	 * This is a field name for the App's installation directory.
 	 * 
-	 * It is a derived field based on the include_path and does not appear in any config file.
+	 * It is a derived field based on the include_path and does not appear in the XML config file.
 	 * 
 	 * @var string
 	 */
@@ -71,6 +65,7 @@ interface AppOptions
 	 * @var string
 	 */
 	const OPTION_INCLUDE_PATH = "includePath";
+	const OPTION_LOGGER = "logger";
 	const OPTION_LOG_FILE = "logFile";
 }
 ?>

@@ -31,7 +31,7 @@ use bizySoft\bizyStore\model\strategies\ScalarFetchStrategy;
  * @see bizySoft\bizyStore\model\statements\StatementI
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class Statement implements StatementI
 {
@@ -490,7 +490,7 @@ abstract class Statement implements StatementI
 	{
 		$oldOptions = $this->options;
 		/*
-		 * Specifically set the class variables based on the options. Options can be null to enable a reset.
+		 * Specifically set the class variables based on the options. Options can be null to enable a reset so we use array_key_exists.
 		 */
 		$this->className = array_key_exists(self::OPTION_CLASS_NAME, $options) ? $options[self::OPTION_CLASS_NAME] : $this->className;
 		$this->classArgs = array_key_exists(self::OPTION_CLASS_ARGS, $options) ? $options[self::OPTION_CLASS_ARGS] : $this->classArgs;

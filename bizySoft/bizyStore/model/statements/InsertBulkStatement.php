@@ -13,7 +13,7 @@ use bizySoft\bizyStore\model\core\DB;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class InsertBulkStatement
 {
@@ -97,6 +97,8 @@ class InsertBulkStatement
 
 	/**
 	 * Construct an insert statement and execute against the database.
+	 * 
+	 * @return integer the number of rows inserted
 	 */
 	public function execute()
 	{

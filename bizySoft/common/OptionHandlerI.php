@@ -9,7 +9,7 @@ namespace bizySoft\common;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 interface OptionHandlerI
 {
@@ -17,6 +17,8 @@ interface OptionHandlerI
 	 * Get the required option specified by the $name.
 	 * 
 	 * @param string $name
+	 * 
+	 * @return mixed
 	 */
 	public function getOption($name = null);
 }

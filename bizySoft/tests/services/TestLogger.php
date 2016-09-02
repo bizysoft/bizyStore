@@ -14,12 +14,11 @@ use bizySoft\common\Logger;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  * @codeCoverageIgnore
  */
 final class TestLogger extends Logger
 {
-	private static $showInterval = false;
 	const MICRO = 1000000;
 	
 	/**
@@ -27,35 +26,72 @@ final class TestLogger extends Logger
 	 *
 	 * @var number
 	 */
-	private static $lastTime = 0;
+	private $lastTime = 0;
 	
 	/**
 	 * Allow multiple log timers to be used
 	 *
 	 * @var array
 	 */
-	private static $timers = array();
+	private $timers = array();
 	
-	protected function __construct()
+	public function __construct($appName, $logFile)
 	{
-		$testDir = "bizySoft" . DIRECTORY_SEPARATOR . "tests";
-		$testDir = stream_resolve_include_path($testDir);
-		
-		parent::__construct("unitTest", $testDir . DIRECTORY_SEPARATOR . "unitTest.log");
+		parent::__construct($appName, $logFile);
 	}
+	
+	/**
+	 * Start a named timer.
+	 *
+	 * Very useful for timing portions of code. Gives you the capability of using nested timers.
+	 *
+	 * @param string $name
+	 */
+	public function startTimer($name)
+	{
+		$this->timers[$name] = $this->getTimeMicro();
+	}
+	
+	/**
+	 * Stop a named timer and log the elapsed time in milliseconds since
+	 * startTimer($name) was called
+	 *
+	 * @param string $name
+	 * @return float the elapsed time in micro seconds
+	 */
+	public function stopTimer($name, $message = null)
+	{
+		$microElapsed = $this->elapsedTimer($name);
+		$elapsed = $this->format($microElapsed, 1000);
+	
+		if (isset($this->timers[$name]))
+		{
+			$timerMessage = "Stopped timer ---'$name'---, elapsed = $elapsed ms";
+			$this->log($message ? $message . " $timerMessage" : $timerMessage);
+			// Destroy the timer
+			unset($this->timers[$name]);
+		}
+		else
+		{
+			$this->log("No timer ---'$name'---");
+		}
+	
+		return $microElapsed;
+	}
+	
 	
 	/**
 	 * Set a new prefix for the message.
 	 *
-	 * If TestLogger::$showInterval is true, prepends an interval to the log message since the last 
-	 * TestLogger::log() call in micro-seconds.
+	 * Prepends an interval to the log message since the last 
+	 * $this->logger->log() call in micro-seconds.
 	 */
 	protected function getPrefix()
 	{
-		$time = self::getTimeMicro();
-		$timePrefix = self::$showInterval ? (self::$lastTime != 0 ? sprintf("% 8d", $time - self::$lastTime) : 0) . " us:" : "";
+		$time = $this->getTimeMicro();
+		$timePrefix = ($this->lastTime != 0 ? sprintf("% 8d", $time - $this->lastTime) : 0) . " us:";
 		$newPrefix = parent::getPrefix() . $timePrefix;
-		self::$lastTime = self::getTimeMicro(); // Don't count the above time to format.
+		$this->lastTime = self::getTimeMicro(); // Don't count the above time to format.
 		return $newPrefix;
 	}
 	
@@ -64,7 +100,7 @@ final class TestLogger extends Logger
 	 * 
 	 * @return number
 	 */
-	private static function getTimeMicro()
+	private function getTimeMicro()
 	{
 		/*
 		 * microtime() is supposedly accurate to microseconds,
@@ -79,7 +115,7 @@ final class TestLogger extends Logger
 	 * @param float $time in microsecs.
 	 * @param int $divisor to show time in other units eg millisecs, secs etc.
 	 */
-	private static function format($time, $divisor = 1)
+	private function format($time, $divisor = 1)
 	{
 		return sprintf("%9.2f", $time / $divisor);
 	}
@@ -88,57 +124,9 @@ final class TestLogger extends Logger
 	 *
 	 * @param float $start
 	 */
-	private static function getElapsed($start)
+	private function getElapsed($start)
 	{
-		return self::getTimeMicro() - $start;
-	}
-	
-	/**
-	 * Set display of log fractional seconds.
-	 *
-	 * @param boolean $showInterval if true then the logs shows an interval since the last log call
-	 */
-	public static function showInterval($showInterval)
-	{
-		self::$showInterval = $showInterval;
-	}
-	
-	/**
-	 * Start a named timer.
-	 * 
-	 * Very useful for timing portions of code. Gives you the capability of using nested timers.
-	 *
-	 * @param string $name
-	 */
-	public static function startTimer($name)
-	{
-		self::$timers[$name] = self::getTimeMicro();
-	}
-	
-	/**
-	 * Stop a named timer and log the elapsed time in milliseconds since
-	 * startTimer($name) was called
-	 *
-	 * @param string $name
-	 * @return float the elapsed time in micro seconds
-	 */
-	public static function stopTimer($name)
-	{
-		$microElapsed = self::elapsedTimer($name);
-		$elapsed = self::format($microElapsed, 1000);
-		
-		if (isset(self::$timers[$name]))
-		{
-			self::log("Stopped timer ---'$name'---, elapsed = $elapsed ms");
-			// Destroy the timer
-			unset(self::$timers[$name]);
-		}
-		else
-		{
-			self::log("No timer ---'$name'---");
-		}
-		
-		return $microElapsed;
+		return $this->getTimeMicro() - $start;
 	}
 	
 	/**
@@ -146,22 +134,11 @@ final class TestLogger extends Logger
 	 *
 	 * @return float
 	 */
-	public static function elapsedTimer($name)
+	private function elapsedTimer($name)
 	{
-		return isset(self::$timers[$name]) ? self::getElapsed(self::$timers[$name]) : -1;
+		return isset($this->timers[$name]) ? $this->getElapsed($this->timers[$name]) : -1;
 	}
-	
-	/**
-	 * Configure the TestLogger.
-	 */
-	public static function configure()
-	{
-		if (!self::getInstance())
-		{
-			new TestLogger();
-			TestLogger::showInterval(true);
-		}
-	}
+
 }
 
 ?>

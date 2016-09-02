@@ -2,10 +2,7 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\model\core\PDODB;
-use bizySoft\bizyStore\services\core\DBManager;
 use bizySoft\tests\services\TestLogger;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-
 
 /**
  * PHPUnit test case class for setting isolation levels.
@@ -15,7 +12,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelIsolationTestCase extends ModelTestCase
 {
@@ -33,17 +30,17 @@ class ModelIsolationTestCase extends ModelTestCase
 		$testableInterfaces = array("MySQL" => "MySQL", "PgSQL" => "PgSQL");
 		$testableIsolationLevels = 0;
 		$testedIsolationLevels = 0;
+		
+		$config = self::getTestcaseConfig();
 		/*
 		 * Do for all db's
 		 */
-		foreach (DBManager::getDBIds() as $dbId)
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
 			try
 			{
-				$db = DBManager::getDB($dbId);
-				$dbConfig = DBManager::getDBConfig($dbId);
-				
-				$testableInterface = isset($testableInterfaces[$dbConfig[BizyStoreOptions::DB_INTERFACE_TAG]]);
+				$db = $config->getDB($dbId);
+				$testableInterface = isset($testableInterfaces[$dbConfig[self::DB_INTERFACE_TAG]]);
 				$testableIsolationLevels += $testableInterface ? count($isolationLevels) : 0;
 				/*
 				 * It's difficult to test isolation levels in this environment, so we set each isolation level
@@ -68,13 +65,13 @@ class ModelIsolationTestCase extends ModelTestCase
 						 */
 						$this->assertEquals($rawStatement, $db->getVendorIsolationLevelStatement($vendorIsolationLevel));
 						$testedIsolationLevels++;
-						TestLogger::log("Tested db '$dbId' with isolation level '$isolationLevel'.");
+						$this->logger->log("Tested db '$dbId' with isolation level '$isolationLevel'.");
 					}
 				}
 			}
 			catch (Exception $e)
 			{
-				TestLogger::log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
+				$this->logger->log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
 				
 				if ($db)
 				{

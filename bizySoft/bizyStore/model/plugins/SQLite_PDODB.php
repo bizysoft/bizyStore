@@ -1,10 +1,11 @@
 <?php
 namespace bizySoft\bizyStore\model\plugins;
 
+use \PDO;
 use bizySoft\bizyStore\model\core\Model;
 use bizySoft\bizyStore\model\core\PDODB;
-use bizySoft\bizyStore\model\core\SchemaI;
 use bizySoft\bizyStore\model\statements\QueryStatement;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Concrete PDODB class for SQLite.
@@ -14,23 +15,23 @@ use bizySoft\bizyStore\model\statements\QueryStatement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class SQLite_PDODB extends PDODB
 {
 	const INTEGER_PRIMARY_KEY_INDEX = "integer_primary_key";
 
 	/**
-	 * Pass the database parameters in an associative array and use them to construct the connection.
+	 * Just pass the database parameters and config.
 	 *
-	 * @param array $dbConfig an associative array containing the
-	 *        database config information supplied in bizySoftConfig.
+	 * @param PDO $db
+	 * @param string $dbId
+	 * @param Config $config
 	 */
-	public function __construct($dbConfig)
+	public function __construct(PDO $db, $dbId, Config $config)
 	{
-		parent::__construct($dbConfig);
+		parent::__construct($db, $dbId, $config);
 	}
-
 	/**
 	 * SQLite's isolation level is always SERIALIZABLE in PHP, so this is a NO-OP for SQLite. 
 	 */
@@ -113,21 +114,21 @@ class SQLite_PDODB extends PDODB
 			 * Default the fields that may not require a definite value
 			 */
 			$columnSchema = array();
-			$columnSchema[SchemaI::SEQUENCED] = "false";
-			$columnSchema[SchemaI::MAX_LENGTH] = null;
-			$columnSchema[SchemaI::SEQUENCE_NAME] = null; // no 'sequences' for SQLite
-			$columnSchema[SchemaI::KEY_TYPE] = null; // We fill the key fields later.
-			$columnSchema[SchemaI::KEY_NAME] = null;
-			$columnSchema[SchemaI::KEY_INDEX] = null;
+			$columnSchema[self::SEQUENCED] = "false";
+			$columnSchema[self::MAX_LENGTH] = null;
+			$columnSchema[self::SEQUENCE_NAME] = null; // no 'sequences' for SQLite
+			$columnSchema[self::KEY_TYPE] = null; // We fill the key fields later.
+			$columnSchema[self::KEY_NAME] = null;
+			$columnSchema[self::KEY_INDEX] = null;
 			/*
 			 * Get the column data that will always be present.
 			 */
 			$columnName = $columnInfo["name"];
-			$columnSchema[SchemaI::TABLE_NAME] = $tableName;
-			$columnSchema[SchemaI::COLUMN_NAME] = $columnName;
-			$columnSchema[SchemaI::ORDINAL_POSITION] = $columnInfo["cid"] + 1;
-			$columnSchema[SchemaI::IS_NULLABLE] = $columnInfo["notnull"] == 1 ? "false" : "true";
-			$columnSchema[SchemaI::COLUMN_DEFAULT] = $columnInfo["dflt_value"];
+			$columnSchema[self::TABLE_NAME] = $tableName;
+			$columnSchema[self::COLUMN_NAME] = $columnName;
+			$columnSchema[self::ORDINAL_POSITION] = $columnInfo["cid"] + 1;
+			$columnSchema[self::IS_NULLABLE] = $columnInfo["notnull"] == 1 ? "false" : "true";
+			$columnSchema[self::COLUMN_DEFAULT] = $columnInfo["dflt_value"];
 			
 			$openingBracePos = strpos($columnInfo["type"], '(');
 			if ($openingBracePos !== false)
@@ -136,12 +137,12 @@ class SQLite_PDODB extends PDODB
 				// There must be a closing brace.
 				$closingBracePos = strpos($columnInfo["type"], ')');
 				$length = $closingBracePos - $openingBracePos;
-				$columnSchema[SchemaI::MAX_LENGTH] = substr($columnInfo["type"], $openingBracePos, $length);
-				$columnSchema[SchemaI::DATA_TYPE] = substr($columnInfo["type"], 0, $openingBracePos - 1);
+				$columnSchema[self::MAX_LENGTH] = substr($columnInfo["type"], $openingBracePos, $length);
+				$columnSchema[self::DATA_TYPE] = substr($columnInfo["type"], 0, $openingBracePos - 1);
 			}
 			else
 			{
-				$columnSchema[SchemaI::DATA_TYPE] = $columnInfo["type"];
+				$columnSchema[self::DATA_TYPE] = $columnInfo["type"];
 			}
 			/*
 			 * Merge key information by filling in and possibly creating a new record based on the present one for
@@ -246,10 +247,10 @@ class SQLite_PDODB extends PDODB
 				{
 					$keyIndex = $columnDetails[$columnName];
 					$result[$columnName][] = array(
-							SchemaI::KEY_TYPE => SchemaI::PRIMARY_KEY,
-							SchemaI::KEY_INDEX => $keyIndex,
-							SchemaI::KEY_NAME => $indexName,
-							SchemaI::SEQUENCED => $sequenced 
+							self::KEY_TYPE => self::PRIMARY_KEY,
+							self::KEY_INDEX => $keyIndex,
+							self::KEY_NAME => $indexName,
+							self::SEQUENCED => $sequenced 
 					);
 				}
 			}
@@ -261,9 +262,9 @@ class SQLite_PDODB extends PDODB
 				foreach ($columnDetails as $columnName => $keyIndex)
 				{
 					$result[$columnName][] = array(
-							SchemaI::KEY_TYPE => SchemaI::UNIQUE,
-							SchemaI::KEY_INDEX => $keyIndex,
-							SchemaI::KEY_NAME => $indexName 
+							self::KEY_TYPE => self::UNIQUE,
+							self::KEY_INDEX => $keyIndex,
+							self::KEY_NAME => $indexName 
 					);
 				}
 			}
@@ -276,10 +277,10 @@ class SQLite_PDODB extends PDODB
 			foreach ($primaryKeys as $columnName => $sequenced)
 			{
 				$result[$columnName][] = array(
-						SchemaI::KEY_TYPE => SchemaI::PRIMARY_KEY,
-						SchemaI::KEY_INDEX => 0,
-						SchemaI::KEY_NAME => self::INTEGER_PRIMARY_KEY_INDEX,
-						SchemaI::SEQUENCED => $sequenced 
+						self::KEY_TYPE => self::PRIMARY_KEY,
+						self::KEY_INDEX => 0,
+						self::KEY_NAME => self::INTEGER_PRIMARY_KEY_INDEX,
+						self::SEQUENCED => $sequenced 
 				);
 			}
 		}
@@ -295,11 +296,11 @@ class SQLite_PDODB extends PDODB
 				{
 					list($tableName, $tableColumn) = each($referenceDetails);
 					$result[$columnName][] = array(
-						SchemaI::KEY_TYPE => SchemaI::FOREIGN_KEY,
-						SchemaI::KEY_INDEX => $keyIndex,
-						SchemaI::KEY_NAME => $indexName,
-						SchemaI::REFERENCED_TABLE => $tableName,
-						SchemaI::REFERENCED_COLUMN => $tableColumn
+						self::KEY_TYPE => self::FOREIGN_KEY,
+						self::KEY_INDEX => $keyIndex,
+						self::KEY_NAME => $indexName,
+						self::REFERENCED_TABLE => $tableName,
+						self::REFERENCED_COLUMN => $tableColumn
 					);
 				}
 			}

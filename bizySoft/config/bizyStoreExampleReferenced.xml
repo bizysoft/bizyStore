@@ -21,8 +21,6 @@
 	* This file will load the <referencedConfigFile> file which should contain all your database config.
 -->
 <bizySoft>
-<!-- The examples are written to reference the <appName> as a namespace. It should remain unchanged . -->
-	<appName>bizyStoreExample</appName> 
 <!-- You should change this to suit your environment. In a shared hosting environment, this refers to bizyStoreExample.xml
      under your 'account home directory' which would contain the bizyStore database config. -->
 	<referencedConfigFile>/path/to/bizyStoreExample.xml</referencedConfigFile>

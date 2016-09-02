@@ -1,9 +1,10 @@
 <?php
 namespace bizySoft\bizyStore\model\plugins;
 
+use \PDO;
 use bizySoft\bizyStore\model\core\PDODB;
 use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Concrete PDODB class for PostgreSQL.
@@ -38,7 +39,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class PgSQL_PDODB extends PDODB
 {
@@ -67,7 +68,7 @@ class PgSQL_PDODB extends PDODB
 			isc.column_name AS \"columnName\",
 			isc.ordinal_position AS \"ordinalPosition\",
 			isc.column_default AS \"columnDefault\",
-			isc.is_nullable AS \"isNullable\",
+			CASE WHEN isc.is_nullable = 'YES' THEN 'true' ELSE 'false' END AS \"isNullable\",
 			isc.data_type AS \"dataType\",
 			isc.character_maximum_length AS \"maxLength\",
 			CASE WHEN iss.sequence_name IS NULL THEN 'false' ELSE 'true' END AS sequenced,
@@ -131,22 +132,20 @@ class PgSQL_PDODB extends PDODB
 		ORDER BY \"ordinalPosition\"";
 	
 	/**
-	 * Pass the database parameters in an associative array and use them to construct the interface.
+	 * Just pass the database parameters and config.
 	 *
-	 * @param array $dbConfig <p>an associative array containing the
-	 *        database config information supplied in bizySoftConfig.</p>
+	 * @param PDO $db
+	 * @param string $dbId
+	 * @param Config $config
 	 */
-	public function __construct($dbConfig)
+	public function __construct(PDO $db, $dbId, Config $config)
 	{
-		/*
-		 * Default the schema
-		 */
-		if (!isset($dbConfig[BizyStoreOptions::DB_SCHEMA_TAG]))
-		{
-			$dbConfig[BizyStoreOptions::DB_SCHEMA_TAG] = "public";
-		}
+		parent::__construct($db, $dbId, $config);
 		
-		parent::__construct($dbConfig);
+		if (!$this->getSchemaName())
+		{
+			$this->setSchemaName("public");
+		}
 	}
 
 	/**

@@ -3,12 +3,10 @@ namespace bizySoft\bizyStore\model\statements;
 
 use \PDO;
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 use bizySoft\bizyStore\model\strategies\ModelSetFetchStrategy;
 use bizySoft\bizyStore\model\strategies\ModelArraySetFetchStrategy;
 use bizySoft\bizyStore\model\strategies\ModelAssocSetFetchStrategy;
 use bizySoft\bizyStore\model\strategies\ModelFuncSetFetchStrategy;
-use bizySoft\bizyStore\services\core\DBManager;
 
 /**
  * Provide additional properties and methods for prepared statements, specifically on Model objects.
@@ -28,7 +26,7 @@ use bizySoft\bizyStore\services\core\DBManager;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class CRUDPreparedStatement extends PreparedStatement
 {	
@@ -58,9 +56,6 @@ abstract class CRUDPreparedStatement extends PreparedStatement
 	/**
 	 * This is a CRUD class so we accept a Model object as a basis in constructing the statement.
 	 *
-	 * Honor the "cache" setting from the MODEL_PREPARE_OPTIONS_TAG in bizySoftConfig. This is turned 
-	 * into OPTION_CACHE in the options.
-	 *
 	 * @param Model $modelObj type checked here to be a Model object.
 	 * @param array $options prepare options.
 	 */
@@ -68,37 +63,45 @@ abstract class CRUDPreparedStatement extends PreparedStatement
 	{
 		$this->modelObj = $modelObj;
 		
-		/*
-		 * Get the db options
-		 */
 		$db = $modelObj->getDB();
-		$dbConfig = DBManager::getDBConfig($db->getDBId());
-		
+		/*
+		 * We set the class name to the Model's class.
+		 * The parent takes care of preparing the statement.
+		 */
+		$options[Statement::OPTION_CLASS_NAME] = get_class($modelObj);
+		parent::__construct($db, $options);
+	}
+	
+	/**
+	 * Honor the "cache" setting from the MODEL_PREPARE_OPTIONS_TAG in bizySoftConfig. This is turned 
+	 * into OPTION_CACHE.
+	 *
+	 * @param array $options A referenece to the options array so we can add to it.
+	 * @param array $dbConfig
+	 */
+	protected function setPrepareOptions(array &$options, array $dbConfig)
+	{
 		/*
 		 * These are general options applied to all CRUDPreparedStatements for the $db.
-		 * 
+		 *
 		 * The idea here is to turn the options specific to CRUD into options that PreparedStatement uses.
 		 */
-		$configModelPrepareOptions = isset($dbConfig[BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG] : array();
+		$configModelPrepareOptions = isset($dbConfig[self::MODEL_PREPARE_OPTIONS_TAG]) ? $dbConfig[self::MODEL_PREPARE_OPTIONS_TAG] : array();
 		
-		if (isset($configModelPrepareOptions[BizyStoreOptions::OPTION_CACHE]))
+		if (isset($configModelPrepareOptions[self::OPTION_CACHE]))
 		{
 			/*
 			 * Only override if the user doesn't explicity specify.
 			 */
-			if (!isset($options[BizyStoreOptions::OPTION_CACHE]))
+			if (!isset($options[self::OPTION_CACHE]))
 			{
-				$options[BizyStoreOptions::OPTION_CACHE] = $configModelPrepareOptions[BizyStoreOptions::OPTION_CACHE];
+				$options[self::OPTION_CACHE] = $configModelPrepareOptions[self::OPTION_CACHE];
 			}
 		}
-		$options[Statement::OPTION_CLASS_NAME] = get_class($modelObj);
 		
-		/*
-		 * The parent takes care of preparing the statement.
-		 */
-		parent::__construct($db, $options);
+		parent::setPrepareOptions($options, $dbConfig);
 	}
-
+	
 	/**
 	 * Get the builder for this statement.
 	 *
@@ -134,6 +137,7 @@ abstract class CRUDPreparedStatement extends PreparedStatement
 	 * This is used to build the where clause for the query.
 	 *
 	 * @param Model $modelObj
+	 * @return array
 	 */
 	protected function getWhereClauseProperties()
 	{

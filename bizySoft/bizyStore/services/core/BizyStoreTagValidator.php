@@ -11,7 +11,7 @@ use bizySoft\common\TagValidator;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class BizyStoreTagValidator extends TagValidator
 {
@@ -25,7 +25,7 @@ class BizyStoreTagValidator extends TagValidator
 		/**
 		 * DATABASE_TAG is the only mandatory field.
 		 */
-		$mandatory = array(BizyStoreOptions::DATABASE_TAG);
+		$mandatory = array(BizyStoreConstants::DATABASE_TAG);
 		parent::__construct($mandatory);
 	}
 }

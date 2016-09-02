@@ -14,9 +14,9 @@ use bizySoft\common\ParentTag;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class DatabaseTag extends ParentTag
+class DatabaseTag extends ParentTag implements BizyStoreConstants
 {
 	/**
 	 * Construct with the name of the tag
@@ -38,7 +38,7 @@ class DatabaseTag extends ParentTag
 	 */
 	public function getKey()
 	{
-		return isset($this->tags[BizyStoreOptions::DB_ID_TAG]) ? $this->tags[BizyStoreOptions::DB_ID_TAG] : $this->name;
+		return isset($this->tags[self::DB_ID_TAG]) ? $this->tags[self::DB_ID_TAG] : $this->name;
 	}
 	
 	/**

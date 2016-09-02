@@ -1,7 +1,6 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\SchemaI;
 /**
  * Store unique key information about a table based on the database id.
  * 
@@ -13,7 +12,7 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class UniqueProperties extends SchemaProperties
 {
@@ -21,6 +20,8 @@ class UniqueProperties extends SchemaProperties
 	 * Transform the key information based on the key's name and the column it relates to.
 	 * 
 	 * We also store a sequence indicator which may prove useful.
+	 * 
+	 * @return array()
 	 * 
 	 */
 	private function transform()
@@ -34,9 +35,9 @@ class UniqueProperties extends SchemaProperties
 		{
 			foreach($columnSchema as $columnProperties)
 			{
-				$indexName = $columnProperties[SchemaI::KEY_NAME];
-				$columnName = $columnProperties[SchemaI::COLUMN_NAME];
-				$sequenced = $columnProperties[SchemaI::SEQUENCED] == "true";
+				$indexName = $columnProperties[self::KEY_NAME];
+				$columnName = $columnProperties[self::COLUMN_NAME];
+				$sequenced = $columnProperties[self::SEQUENCED] == "true";
 				
 				if(!isset($uniqueProperties[$dbId]))
 				{
@@ -55,20 +56,24 @@ class UniqueProperties extends SchemaProperties
 	}
 	
 	/**
-	 * @see \bizySoft\bizyStore\generator\SchemaProperties::codify()
+	 * Transform and generate code.
+	 * 
+	 * @return string
 	 */
 	public function codify()
 	{
 		$uniqueProperties = $this->transform();
 		
-		return self::stringify($uniqueProperties);
+		return $this->stringify($uniqueProperties);
 	}
 	
 	/**
 	 * Generate the code to support unique key behaviour for a database table
 	 * keyed on the dbId.
+	 * 
+	 * @return string
 	 */
-	public static function stringify(array $uniqueProperties)
+	public function stringify(array $uniqueProperties)
 	{
 		/*
 		 * Generate the unique key info into the file contents string.
@@ -103,6 +108,8 @@ class UniqueProperties extends SchemaProperties
 	 * Gets the unique keys in order of preference.
 	 * 
 	 * Sequenced keys are preferred over non-sequenced. A sequenced key is a key that has one or more sequenced columns.
+	 * 
+	 * @return array
 	 */
 	public function keyCandidates()
 	{

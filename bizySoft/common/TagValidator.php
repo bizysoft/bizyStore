@@ -21,7 +21,7 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class TagValidator extends TagGrinder
 {
@@ -84,7 +84,6 @@ abstract class TagValidator extends TagGrinder
 	 * Default implementation. Validate the key => value set.
 	 *
 	 * @return array we just return the original key/value set as an associative array.
-	 * @see \bizySoft\common\Grinder::grind()
 	 */
 	public function grind()
 	{

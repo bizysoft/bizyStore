@@ -12,32 +12,10 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 interface SchemaI
 {
-	const PRIMARY_KEY = "PRIMARY KEY";
-	const UNIQUE = "UNIQUE";
-	const FOREIGN_KEY = "FOREIGN KEY";
-	
-	/*
-	 * Key constants for each column.
-	 */
-	const TABLE_NAME = "tableName";
-	const COLUMN_NAME = "columnName";
-	const ORDINAL_POSITION = "ordinalPosition";
-	const COLUMN_DEFAULT = "columnDefault";
-	const IS_NULLABLE = "isNullable";
-	const DATA_TYPE = "dataType";
-	const MAX_LENGTH = "maxLength";
-	const SEQUENCED = "sequenced";
-	const KEY_TYPE = "keyType";
-	const SEQUENCE_NAME = "sequenceName";
-	const KEY_INDEX = "keyIndex";
-	const KEY_NAME = "keyName";
-	const REFERENCED_TABLE = "referencedTable";
-	const REFERENCED_COLUMN = "referencedColumn";
-	
 	/**
 	 * Get the ColumnSchema for the Model.
 	 *
@@ -52,7 +30,7 @@ interface SchemaI
 	/**
 	 * Get the SequenceSchema for the Model.
 	 *
-	 * Sequences in this context mean any column that is generated automatically by the database and possibly retrievable 
+	 * Sequences in this context mean any identity column that is generated automatically by the database and possibly retrievable 
 	 * by DB::getInsertId().
 	 * 
 	 * They are not necessarily primary key columns in all cases. There can be zero or more sequences defined for a table.

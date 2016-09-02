@@ -1,6 +1,8 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
+use bizySoft\bizyStore\model\core\SchemaConstants;
+
 /**
  * Base class to support *Schema class file generation.
  * 
@@ -12,17 +14,14 @@ namespace bizySoft\bizyStore\generator;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class SchemaProperties
-{
-	const SEQUENCED = "sequenced";
-	const NON_SEQUENCED = "non_sequenced";
-	
+abstract class SchemaProperties implements SchemaConstants
+{	
 	protected $properties = array();
 	
 	/**
-	 * Add the column schema keyed on the dbId passed in.
+	 * Add the column based schema keyed on the dbId passed in.
 	 * 
 	 * @param string $dbId
 	 * @param array $columnSchema
@@ -37,8 +36,10 @@ abstract class SchemaProperties
 		$this->properties[$dbId][] = $columnSchema;
 	}	
 	
-	/*
+	/**
 	 * Gets the properties stored.
+	 * 
+	 * @return array
 	 */
 	public function getProperties()
 	{
@@ -49,7 +50,6 @@ abstract class SchemaProperties
 	 * Generate PHP code for these properties.
 	 * 
 	 * This massages the stored properties into the required form and returns the PHP code.
-	 * Usually a generated array definition.
 	 * 
 	 * @return string
 	 */

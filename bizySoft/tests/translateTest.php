@@ -5,8 +5,8 @@ use bizySoft\bizyStore\model\statements\StatementBuilder;
 use bizySoft\bizyStore\model\statements\PreparedStatementBuilder;
 use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
 use bizySoft\bizyStore\model\statements\QueryStatement;
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\Membership;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Membership;
 
 /**
  * Test the translate method for all configured databases.
@@ -16,7 +16,7 @@ use bizySoft\bizyStore\model\unitTest\Membership;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class TranslateTestCase extends ModelTestCase
 {

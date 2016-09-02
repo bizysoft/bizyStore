@@ -18,9 +18,9 @@ use bizySoft\common\TagValidator;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class DatabaseTagValidator extends TagValidator
+class DatabaseTagValidator extends TagValidator implements BizyStoreConstants
 {	
 	/**
 	 * The mandatory fields for each database configured.
@@ -30,20 +30,20 @@ class DatabaseTagValidator extends TagValidator
 	 * @var array
 	 */
 	private static $mandatoryDB = array(
-					BizyStoreOptions::DB_ID_TAG,
-					BizyStoreOptions::DB_INTERFACE_TAG,
-					BizyStoreOptions::DB_NAME_TAG
+					self::DB_ID_TAG,
+					self::DB_INTERFACE_TAG,
+					self::DB_NAME_TAG
 	);
 	
 	/**
 	 * The optional fields for each database configured. If specified, they must contain a value.
 	 */
 	private static $optionalDB = array(
-					BizyStoreOptions::DB_CHARSET_TAG,
-					BizyStoreOptions::DB_PORT_TAG,
-					BizyStoreOptions::DB_SOCKET_TAG,
-					BizyStoreOptions::DB_TABLES_TAG,
-					BizyStoreOptions::DB_RELATIONSHIPS_TAG
+					self::DB_CHARSET_TAG,
+					self::DB_PORT_TAG,
+					self::DB_SOCKET_TAG,
+					self::DB_TABLES_TAG,
+					self::DB_RELATIONSHIPS_TAG
 	);
 	
 	/**

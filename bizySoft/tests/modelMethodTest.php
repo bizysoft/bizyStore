@@ -2,7 +2,6 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 
 /**
  *
@@ -13,7 +12,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelMethodTestCase extends ModelTestCase
 {
@@ -26,7 +25,8 @@ class ModelMethodTestCase extends ModelTestCase
 		 * They should exist in all the test databases configured with the bizySoft/tests/testData scripts.
 		 * In any case, they exist in the SQLite database configured with the distribution
 		 */
-		$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
 		
 		return array(
 				array("$modelNamespace\\Member"),
@@ -44,8 +44,9 @@ class ModelMethodTestCase extends ModelTestCase
 		 * They should exist in all the test databases configured with the bizySoft/tests/testData scripts.
 		 * In any case, they exist in the SQLite database configured with the distribution.
 		 */
-		$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
-		
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
+				
 		return array(
 				array("$modelNamespace\\Member"),
 				array("$modelNamespace\\Membership"),

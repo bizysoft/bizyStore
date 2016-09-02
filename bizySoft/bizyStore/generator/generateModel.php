@@ -1,17 +1,18 @@
 <?php
 
 use bizySoft\bizyStore\generator\ModelGenerator;
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
 
 /**
- * Model and Schema class files are automatically generated into the bizySoft/bizyStore/model/&lt;appName&gt; directory 
- * by bizyStore in normal operation, where &lt;appName&gt; is from the bizySoftConfig file.
+ * Model and Schema class files are automatically generated into the bizySoft/bizyStore/app/&lt;appName&gt; directory 
+ * by bizyStore in normal operation, where &lt;appName&gt; is from bizySoftConfig.
  * 
  * This is a command line utility program to achieve the same result should you require it.
  *
  * Make sure you have your PHP include_path set to resolve the bizySoft directory.
  * 
- * By default it looks for bizySoft/config/bizySoftConfig.xml file which should include all the config that your 
- * application requires including the &lt;appName&gt;.
+ * It looks for either bizySoft/config/generator.xml or bizySoft/config/bizySoftConfig.xml in that order which should 
+ * include all the config that your application requires.
  *
  * Run this from the place that contains the bizySoft directory like so:
  *
@@ -22,16 +23,15 @@ use bizySoft\bizyStore\generator\ModelGenerator;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 
 /*
  * Set some server vars that won't be set through CLI and run the ModelGenerator.
  *
- * This will use bizySoftConfig.xml by default. You can change this to reference another
- * domain specific file if you require, see BizyStoreConfig API doco.
+ * This will use generator.xml if it exists or the default bizySoftConfig.xml file.
  */
-$_SERVER['SERVER_NAME'] = "";
+$_SERVER['SERVER_NAME'] = "generator";
 /*
  *  Bootstrap auto-loader by including this file.
  */
@@ -41,7 +41,9 @@ include str_replace("/", DIRECTORY_SEPARATOR, "bizySoft/bizyStore/services/core/
  */
 try
 {
-	$generator = new ModelGenerator();
+	$config = BizyStoreConfig::getInstance();
+	
+	$generator = new ModelGenerator($config);
 	
 	$generator->generate();
 	

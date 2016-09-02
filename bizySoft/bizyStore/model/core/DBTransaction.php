@@ -11,7 +11,7 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class DBTransaction
 {
@@ -56,7 +56,7 @@ class DBTransaction
 	/**
 	 * Get the current update policy for this transaction.
 	 *
-	 * @return number can be either DBTransaction::UPDATE_POLICY_UNIQUE or DBTransaction::UPDATE_POLICY_MULTIPLE
+	 * @return integer can be either DBTransaction::UPDATE_POLICY_UNIQUE or DBTransaction::UPDATE_POLICY_MULTIPLE
 	 */
 	public function getUpdatePolicy()
 	{
@@ -71,8 +71,8 @@ class DBTransaction
 	 * The $policy can be either DBTransaction::UPDATE_POLICY_UNIQUE or DBTransaction::UPDATE_POLICY_MULTIPLE
 	 * otherwise the update policy is not changed.
 	 * 
-	 * @param int $policy 
-	 * @return int the value of the last update policy.
+	 * @param integer $policy 
+	 * @return integer the value of the last update policy.
 	 */
 	public function setUpdatePolicy($policy)
 	{
@@ -118,7 +118,7 @@ class DBTransaction
 	/**
 	 * Gets the current count.
 	 *
-	 * @return number
+	 * @return integer
 	 */
 	public function getCount()
 	{

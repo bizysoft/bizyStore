@@ -3,7 +3,6 @@ namespace bizySoft\tests;
 
 use \Exception;
 use \PDO;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 use bizySoft\common\XMLToArrayTransformer;
 
 /**
@@ -15,7 +14,7 @@ use bizySoft\common\XMLToArrayTransformer;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class TransformerTestCase extends ModelTestCase
 {
@@ -73,17 +72,17 @@ class TransformerTestCase extends ModelTestCase
 		 * Use the same validations/transformations as BizyStoreConfig
 		 */
 			$transformerMap = array(
-					BizyStoreOptions::BIZYSOFT_TAG => "bizySoft\common\BizySoftTag",
-					BizyStoreOptions::BIZYSTORE_TAG => "bizySoft\bizyStore\services\core\BizyStoreTag",
-					BizyStoreOptions::DATABASE_TAG => "bizySoft\bizyStore\services\core\DatabaseTag",
-					BizyStoreOptions::DB_RELATIONSHIPS_TAG => "bizySoft\bizyStore\services\core\RelationshipsTag",
-					BizyStoreOptions::REL_FOREIGN_KEYS_TAG => "bizySoft\bizyStore\services\core\ForeignKeysTag",
-					BizyStoreOptions::REL_RECURSIVE_TAG => "bizySoft\bizyStore\services\core\RecursiveTag",
-					BizyStoreOptions::DB_TABLES_TAG => "bizySoft\bizyStore\services\core\TablesTag",
-					BizyStoreOptions::PDO_OPTIONS_TAG => "bizySoft\common\ConstantOptionsTag",
-					BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG => "bizySoft\common\ConstantOptionsTag",
-					BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG => "bizySoft\common\ConstantOptionsTag",
-					BizyStoreOptions::OPTIONS_TAG => "bizySoft\common\ConstantOptionsTag"
+					self::BIZYSOFT_TAG => 'bizySoft\common\BizySoftTag',
+					self::BIZYSTORE_TAG => 'bizySoft\bizyStore\services\core\BizyStoreTag',
+					self::DATABASE_TAG => 'bizySoft\bizyStore\services\core\DatabaseTag',
+					self::DB_RELATIONSHIPS_TAG => 'bizySoft\bizyStore\services\core\RelationshipsTag',
+					self::REL_FOREIGN_KEYS_TAG => 'bizySoft\bizyStore\services\core\ForeignKeysTag',
+					self::REL_RECURSIVE_TAG => 'bizySoft\bizyStore\services\core\RecursiveTag',
+					self::DB_TABLES_TAG => 'bizySoft\bizyStore\services\core\TablesTag',
+					self::PDO_OPTIONS_TAG => 'bizySoft\common\ConstantOptionsTag',
+					self::PDO_PREPARE_OPTIONS_TAG => 'bizySoft\common\ConstantOptionsTag',
+					self::MODEL_PREPARE_OPTIONS_TAG => 'bizySoft\common\ConstantOptionsTag',
+					self::OPTIONS_TAG => 'bizySoft\common\ConstantOptionsTag'
 			);
 		
 		return $transformerMap;
@@ -92,46 +91,46 @@ class TransformerTestCase extends ModelTestCase
 	public function testXMLToArray()
 	{
 		$expected = array(
-			BizyStoreOptions::APP_NAME_TAG => "yourAppName",
-			BizyStoreOptions::BIZYSTORE_TAG => array(
-				BizyStoreOptions::DATABASE_TAG => array(
+				self::APP_NAME_TAG => "yourAppName",
+				self::BIZYSTORE_TAG => array(
+				self::DATABASE_TAG => array(
 						"A" => array(
-								BizyStoreOptions::DB_HOST_TAG => "dbAHost",
-								BizyStoreOptions::DB_NAME_TAG => "dbAName",
-								BizyStoreOptions::DB_PORT_TAG => "dbAPort",
-								BizyStoreOptions::DB_USER_TAG => "dbAUser",
-								BizyStoreOptions::DB_PASSWORD_TAG => "dbAPassword",
-								BizyStoreOptions::DB_CHARSET_TAG => "dbACharset",
-								BizyStoreOptions::DB_INTERFACE_TAG => "MySQL",
-								BizyStoreOptions::DB_ID_TAG => "A",
-								BizyStoreOptions::PDO_OPTIONS_TAG => array(
+								self::DB_HOST_TAG => "dbAHost",
+								self::DB_NAME_TAG => "dbAName",
+								self::DB_PORT_TAG => "dbAPort",
+								self::DB_USER_TAG => "dbAUser",
+								self::DB_PASSWORD_TAG => "dbAPassword",
+								self::DB_CHARSET_TAG => "dbACharset",
+								self::DB_INTERFACE_TAG => "MySQL",
+								self::DB_ID_TAG => "A",
+								self::PDO_OPTIONS_TAG => array(
 										PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 										PDO::ATTR_EMULATE_PREPARES => false 
 								),
-								BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG => array(
+								self::PDO_PREPARE_OPTIONS_TAG => array(
 										PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL 
 								),
-								BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG => array(
-										BizyStoreOptions::OPTION_CACHE => true 
+								self::MODEL_PREPARE_OPTIONS_TAG => array(
+										self::OPTION_CACHE => true 
 								) 
 						),
 						"B" => array(
-								BizyStoreOptions::DB_NAME_TAG => "dbDName",
-								BizyStoreOptions::DB_INTERFACE_TAG => "SQLite",
-								BizyStoreOptions::DB_ID_TAG => "B",
-								BizyStoreOptions::PDO_OPTIONS_TAG => array(
+								self::DB_NAME_TAG => "dbDName",
+								self::DB_INTERFACE_TAG => "SQLite",
+								self::DB_ID_TAG => "B",
+								self::PDO_OPTIONS_TAG => array(
 										PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 										PDO::ATTR_EMULATE_PREPARES => false 
 								) 
 						) 
 				),
-				BizyStoreOptions::OPTIONS_TAG => array(
-						BizyStoreOptions::OPTION_CLEAN_UP => "commit" 
+				self::OPTIONS_TAG => array(
+						self::OPTION_CLEAN_UP => "commit" 
 				) 
 			),
-			BizyStoreOptions::OPTIONS_TAG => array(
-					BizyStoreOptions::OPTION_INCLUDE_PATH => "/some/include/path",
-					BizyStoreOptions::OPTION_LOG_FILE => "/path/to/logFile" 
+			self::OPTIONS_TAG => array(
+					self::OPTION_INCLUDE_PATH => "/some/include/path",
+					self::OPTION_LOG_FILE => "/path/to/logFile" 
 			) 
 		);
 		
@@ -190,7 +189,7 @@ class TransformerTestCase extends ModelTestCase
 		catch(Exception $e)
 		{
 			$expected = "Line 3: Element bizySoft content does not follow the DTD, expecting " .
-			"(appName , bizyStore? , options?), got (bizyStore)\n" .
+			"(appName , bizyStore? , rest? , options?), got (bizyStore)\n" .
 			"Line 6: Element database content does not follow the DTD, expecting " .
 			"(id , interface , host? , port? , socket? , name , schema? , user? , password? ," .
 			" charset? , tables? , relationships? , pdoOptions? , pdoPrepareOptions? , modelPrepareOptions?), got (user password ". 
@@ -419,15 +418,15 @@ class TransformerTestCase extends ModelTestCase
 			
 		$transformerMap = $this->getTransformerMap();
 		$expected = array(
-				BizyStoreOptions::APP_NAME_TAG => "yourAppName",
-				BizyStoreOptions::BIZYSTORE_TAG => array(
-						BizyStoreOptions::DATABASE_TAG => array(
+				self::APP_NAME_TAG => "yourAppName",
+				self::BIZYSTORE_TAG => array(
+						self::DATABASE_TAG => array(
 								"A" => array(
-										BizyStoreOptions::DB_ID_TAG => "A",
-										BizyStoreOptions::DB_INTERFACE_TAG => "SQLite",
-										BizyStoreOptions::DB_NAME_TAG => "dbAName",
-										BizyStoreOptions::DB_RELATIONSHIPS_TAG => array(
-												BizyStoreOptions::REL_FOREIGN_KEYS_TAG => array(
+										self::DB_ID_TAG => "A",
+										self::DB_INTERFACE_TAG => "SQLite",
+										self::DB_NAME_TAG => "dbAName",
+										self::DB_RELATIONSHIPS_TAG => array(
+												self::REL_FOREIGN_KEYS_TAG => array(
 														"membership" => array(
 																array("memberId" => "member.id"),
 																array("adminId" => "member.id")
@@ -438,19 +437,19 @@ class TransformerTestCase extends ModelTestCase
 																"memberDob" => "uniqueKeyMember.dob")
 														)
 												),
-												BizyStoreOptions::REL_RECURSIVE_TAG => array(
+												self::REL_RECURSIVE_TAG => array(
 														"membership.adminId" => "membership.adminId"
 												)
 										),
-										BizyStoreOptions::PDO_OPTIONS_TAG => array(
+										self::PDO_OPTIONS_TAG => array(
 												PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 												PDO::ATTR_EMULATE_PREPARES => false
 										),
-										BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG => array(
+										self::PDO_PREPARE_OPTIONS_TAG => array(
 												PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL
 										),
-										BizyStoreOptions::MODEL_PREPARE_OPTIONS_TAG => array(
-												BizyStoreOptions::OPTION_CACHE => true
+										self::MODEL_PREPARE_OPTIONS_TAG => array(
+												self::OPTION_CACHE => true
 										)
 								)
 						)

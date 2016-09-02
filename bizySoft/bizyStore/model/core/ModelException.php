@@ -13,7 +13,7 @@ use \Exception;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelException extends Exception
 {
@@ -21,7 +21,7 @@ class ModelException extends Exception
 	 * Just pass through params to parent.
 	 *
 	 * @param string $message
-	 * @param number $code
+	 * @param integer $code
 	 * @param Exception $previous
 	 */
 	public function __construct($message, $code = 0, Exception $previous = null)

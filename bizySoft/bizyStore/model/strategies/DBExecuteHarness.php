@@ -14,7 +14,7 @@ use bizySoft\bizyStore\model\core\ModelException;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class DBExecuteHarness extends DBAccessHarness
 {
@@ -32,6 +32,7 @@ class DBExecuteHarness extends DBAccessHarness
 	 * Harness the database access and provide some fault tolerance.
 	 *
 	 * @param callable $closure the code that runs in the harness.
+	 * @return mixed
 	 * @throws ModelException
 	 */
 	public function harness($closure)

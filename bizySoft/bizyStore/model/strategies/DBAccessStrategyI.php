@@ -9,7 +9,7 @@ namespace bizySoft\bizyStore\model\strategies;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 interface DBAccessStrategyI
 {
@@ -17,6 +17,8 @@ interface DBAccessStrategyI
 	 * Execute the access strategy
 	 * 
 	 * @param array the properties that the strategy uses in the database access.
+	 * 
+	 * @return mixed
 	 */
 	public function execute($properties = array());
 }

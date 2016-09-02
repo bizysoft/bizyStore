@@ -13,7 +13,7 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class BizySoftTag extends Tag
 {

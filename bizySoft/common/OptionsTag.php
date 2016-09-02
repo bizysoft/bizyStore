@@ -16,7 +16,7 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class OptionsTag extends Tag
 {
@@ -39,6 +39,7 @@ abstract class OptionsTag extends Tag
 	 * or whitespace options.
 	 *
 	 * @param string $bulkOptions
+	 * @return array
 	 */
 	public function transform($bulkOptions)
 	{

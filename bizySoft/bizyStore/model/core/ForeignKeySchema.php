@@ -15,7 +15,7 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ForeignKeySchema extends RelationshipSchema
 {
@@ -66,7 +66,7 @@ class ForeignKeySchema extends RelationshipSchema
 	/**
 	 * Gets the appropriate column name for the relationship.
 	 *
-	 * @return string.
+	 * @return string
 	 */
 	protected function getRelColumnName($localColumn, $foreignColumn)
 	{
@@ -76,7 +76,7 @@ class ForeignKeySchema extends RelationshipSchema
 	/**
 	 * Gets the appropriate table name for the relationship.
 	 *
-	 * @return string.
+	 * @return string
 	 */
 	protected function getRelTableName($localTable, $foreignTable)
 	{

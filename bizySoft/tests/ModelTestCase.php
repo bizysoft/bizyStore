@@ -4,8 +4,7 @@ namespace bizySoft\tests;
 use \Exception;
 use bizySoft\bizyStore\model\core\Model;
 use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -19,15 +18,18 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
+abstract class ModelTestCase extends \PHPUnit_Framework_TestCase implements BizyStoreConstants
 {
 	const ITERATIONS = 10; // Default to 10 iterations
 	const SUFFIX_FORMAT = "%06d";
-	const TEST_SEPARATOR = "**********************************************************************";
+	const TEST_SEPARATOR = "********************************";
 
 	protected $formData;
+	protected $logger;
+	
+	protected static $testCaseConfig;
 
 	/**
 	 * These are the main class names that are used by most testcases.
@@ -41,8 +43,9 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 		/*
 		 * These are used for dynamic instantiation, so must be fully qualified class names
 		 */
-		$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
-		
+		$config = BizyStoreConfig::getInstance();
+		$modelNamespace = $config->getModelNamespace();
+				
 		return array(
 				"$modelNamespace\\Member",
 				"$modelNamespace\\UniqueKeyMember",
@@ -100,13 +103,15 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 	public function runTransactionOnAllDatabasesAndTables($closure)
 	{
 		$classNames = self::getTestClasses();
+		$config = self::getTestcaseConfig();
+		
 		// Do for all db's
-		foreach (DBManager::getDBIds() as $dbId)
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
 			$txn = null;
 			try
 			{
-				$db = DBManager::getDB($dbId);
+				$db = $config->getDB($dbId);
 				$txn = $db->beginTransaction();
 				// Do for all our test classes (tables)
 				foreach ($classNames as $className)
@@ -117,8 +122,8 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 			}
 			catch (Exception $e)
 			{
-				TestLogger::log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
-				TestLogger::log($e->getMessage());
+				$this->logger->log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
+				$this->logger->log($e->getMessage());
 				if ($txn)
 				{
 					$txn->rollback();
@@ -133,21 +138,23 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 	 */
 	public function runTransactionOnAllDatabases($closure)
 	{
+		$config = self::getTestcaseConfig();
+		
 		// Do for all db's
-		foreach (DBManager::getDBIds() as $dbId)
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
 			$txn = null;
 			try
 			{
-				$db = DBManager::getDB($dbId);
+				$db = $config->getDB($dbId);
 				$txn = $db->beginTransaction();
 				$closure($db, $txn);
 				$txn->commit();
 			}
 			catch (Exception $e)
 			{
-				TestLogger::log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
-				TestLogger::log($e->getMessage());
+				$this->logger->log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
+				$this->logger->log($e->getMessage());
 				if ($txn)
 				{
 					$txn->rollback();
@@ -157,13 +164,24 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 		}
 	}
 
+	public static function getTestcaseConfig()
+	{
+		if (self::$testCaseConfig === null)
+		{
+			self::$testCaseConfig = BizyStoreConfig::getInstance();
+		}
+		return self::$testCaseConfig;
+	}
+	
 	/**
 	 * Clean out the databases to start each test from a known point.
 	 * Sets up a timer for the test.
 	 */
 	public function setUp()
-	{
+	{		
 		$this->formData = new ModelFormData();
+		$config = self::getTestcaseConfig();
+		$this->logger = $config->getLogger();
 		
 		$this->runTransactionOnAllDatabasesAndTables(function ($db, $outerTxn, $className) {
 			$model = new $className(null, $db);
@@ -195,19 +213,16 @@ abstract class ModelTestCase extends \PHPUnit_Framework_TestCase
 			$result = $db->execute($truncate);
 		});
 		
-		TestLogger::log(self::TEST_SEPARATOR);
-		TestLogger::log("* Test case " . $this->getName() . " starting. ");
-		TestLogger::startTimer(get_class($this) . "::" . $this->getName());
+		$this->logger->log(self::TEST_SEPARATOR . " " . $this->getName() . " starting. ");
+		$this->logger->startTimer(get_class($this) . "::" . $this->getName());
 	}
 
 	/**
-	 * Log a meesage that the test has finished with timing.
+	 * Log a message that the test has finished with timing.
 	 */
 	public function tearDown()
 	{
-		TestLogger::stopTimer(get_class($this) . "::" . $this->getName());
-		TestLogger::log("Test case " . $this->getName() . " complete.");
-		TestLogger::log(self::TEST_SEPARATOR);
+		$this->logger->stopTimer(get_class($this) . "::" . $this->getName(), self::TEST_SEPARATOR . " " . $this->getName() . " complete.");
 	}
 	
 	/**

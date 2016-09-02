@@ -1,10 +1,10 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
- * Abstract base class specifying behaviour used for generating a set of Model and Schema class files.
+ * Abstract base class. Holds a set of class files.
  *
  * This class forms part of the code generation framework and is only referenced by the ModelGenerator.
  *
@@ -13,7 +13,7 @@ use bizySoft\bizyStore\services\core\BizyStoreConfig;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class ClassFileSet extends ClassFile
 {
@@ -25,24 +25,11 @@ abstract class ClassFileSet extends ClassFile
 	public $classFiles = array();
 	
 	/**
-	 * The name of the application from the bizySoftConfig file.
-	 * 
-	 * @var string
-	 */
-	public $appName;
-	
-	/**
 	 * Set class variables from the bizySoftConfig file.
 	 */
-	public function __construct()
+	public function __construct(Config $config)
 	{
-		$appName = BizyStoreConfig::getAppName();
-		if ($appName)
-		{
-			$appName = ucfirst($appName);
-		}
-		
-		$this->appName = $appName;
+		parent::__construct($config);
 	}
 	
 	/**
@@ -54,12 +41,7 @@ abstract class ClassFileSet extends ClassFile
 	 */
 	public function generateDefinition(ReferencedProperties $referencedProperties = null)
 	{
-		$result = "";
-		foreach ($this->classFiles as $classFile)
-		{
-			$result .= $classFile->generateDefinition($referencedProperties);
-		}
-		return $result;
+		return "";
 	}
 }
 

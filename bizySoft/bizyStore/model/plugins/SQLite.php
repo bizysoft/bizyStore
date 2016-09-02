@@ -2,7 +2,6 @@
 namespace bizySoft\bizyStore\model\plugins;
 
 use \PDO;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 use bizySoft\bizyStore\services\core\Connector;
 
 /**
@@ -13,7 +12,7 @@ use bizySoft\bizyStore\services\core\Connector;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class SQLite extends Connector
 {
@@ -31,12 +30,12 @@ class SQLite extends Connector
 	public function connect(array $dbConfig)
 	{
 		$dsn = "sqlite:";
-		$dbName = $dbConfig[BizyStoreOptions::DB_NAME_TAG]; // name is mandatory.
+		$dbName = $dbConfig[self::DB_NAME_TAG]; // name is mandatory.
 	
 		$dsn .= $dbName;
 		// $dbOptions in $dbConfig is an array of name value pairs for the
 		// attributes that can be set on a particular connection.
-		$dbOptions = isset($dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG] : array();
+		$dbOptions = isset($dbConfig[self::PDO_OPTIONS_TAG]) ? $dbConfig[self::PDO_OPTIONS_TAG] : array();
 	
 		$db = new PDO($dsn, null, null, $dbOptions);
 	

@@ -2,7 +2,6 @@
 namespace bizySoft\common;
 
 use \Exception;
-
 /**
  * Base class for configuring an application from its config file.
  * 
@@ -11,9 +10,9 @@ use \Exception;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class AppConfig extends Singleton
+abstract class AppConfig extends Singleton implements AppConstants
 {
 	/**
 	 * Holds the properties from the AppConfig file.
@@ -23,99 +22,35 @@ abstract class AppConfig extends Singleton
 	private $appProperties = null;
 	
 	/**
-	 * Gets any other config that the derived class requires.
-	 * 
-	 * @param array $parentConfig reference to this config.
-	 */
-	protected abstract function getDerivedConfig(array &$parentConfig);
-	
-	/**
-	 * Get the config transformer from the derived class.
-	 * 
-	 * Used for transforming the AppConfig file to a form required by the application.
-	 * This is application specific, usually an XMLToArrayTransformer.
-	 * 
-	 * @param string $fileName the filename to get the transformer on.
-	 * 
-	 * @returns GrinderI
-	 */
-	protected abstract function getTransformer($fileName);
-	
-	/**
 	 * Initialise with the config file name.
 	 * 
 	 * Can only be constructed from derived classes.
 	 * 
 	 * @throws Exception if the file cannot be opened or is not valid.
 	 */
-	protected function __construct($appConfigFileName)
+	protected function __construct()
 	{
-		if (!$appConfigFileName)
-		{
-			throw new Exception("AppConfig file could not be resolved.");
-		}
+		/**
+		 * build a class name
+		 */
+		$configClass = $this->getConfigClass();
+		/*
+		 * If the class does not exist then the autoloader implementation will generate it
+		 * by reading the bizySoftConfig file.
+		 */
+		$config = new $configClass();
+		
+		$this->appProperties = $config->getConfig();
+		
 		parent::__construct();
-		$this->initialise($appConfigFileName);
 	}
 	
 	/**
-	 * Initialises the in memory config entries from the AppConfig file.
+	 * Gets the fully qualified name of the generated confg class.
 	 * 
-	 * @param $appConfigFileName the full path of the AppConfig file name.
-	 * @throws Exception if the file cannot be opened or validated.
+	 * @return string
 	 */
-	private function initialise($appConfigFileName)
-	{
-		/*
-		 * Read AppConfig file and set class variables
-		 */
-		$configTransformer = $this->getTransformer($appConfigFileName);
-		$referencedConfigFile = null;
-		if ($configTransformer)
-		{
-			$this->appProperties = $configTransformer->grind();
-			$referencedConfigFile = isset($this->appProperties[AppOptions::REFERENCED_CONFIG_FILE]) ? 
-			                              $this->appProperties[AppOptions::REFERENCED_CONFIG_FILE] : null;
-			if ($referencedConfigFile)
-			{
-				$xml = trim(file_get_contents($referencedConfigFile));
-				if ($xml)
-				{
-					$configTransformer->setXML($xml);
-					$this->appProperties = $configTransformer->grind();
-					$this->appProperties[AppOptions::REFERENCED_CONFIG_FILE] = $referencedConfigFile;
-				}
-				else
-				{
-					$class = get_class($this);
-					throw new Exception("Unable to resolve $class file : $referencedConfigFile");
-				}
-			}
-		}
-		else
-		{
-			$class = get_class($this);
-			throw new Exception("Unable to resolve $class file : $appConfigFileName");
-		}
-		/*
-		 * Add the file name we processed into the config.
-		 */
-		$this->appProperties[AppOptions::CONFIG_FILE_NAME] = $appConfigFileName;
-		/*
-		 * Fill up the config with specific goodies.
-		 * 
-		 * We send over a reference to the appProperties to allow direct setting of config.
-		 */
-		$this->getDerivedConfig($this->appProperties);
-		/*
-		 * Now get the additional includePath from AppConfig if any is specified
-		 * and set into the app include path.
-		 */
-		if (isset($this->appProperties[AppOptions::OPTION_INCLUDE_PATH]))
-		{
-			self::appendIncludePath($this->appProperties[AppOptions::OPTION_INCLUDE_PATH]);
-		}
-	}
+	abstract public function getConfigClass();
 	
 	/**
 	 * Allow implementations to set properties.
@@ -129,39 +64,37 @@ abstract class AppConfig extends Singleton
 	}
 	
 	/**
-	 * Get all the properties specified in the AppConfig file.
-	 *
-	 * @return array an associative array of all the config.
+	 * 
+	 * @param string $property The property key to find.
+	 * @param boolean $root Search only the root of the appProperties.
+	 * @return mixed
 	 */
-	public static function getAppProperties()
-	{
-		$appConfig = self::getInstance();
-		
-		return $appConfig ? $appConfig->appProperties : null;
-	}
-	
-	/**
-	 * Get a property value from AppConfig.
-	 *
-	 * @param string $property the property name.
-	 * @return mixed either a string or array representing
-	 *         the property value or null if the property
-	 *         is not found or has no value.
-	 */
-	public static function getProperty($property)
+	public function getProperty($property, $root = false)
 	{
 		$result = null;
 		
-		$properties = self::getAppProperties();
-		
-		$optionHandler = new ArrayOptionHandler($properties);
-		$option = $optionHandler->getOption($property);
-		
-		if ($option)
+		$properties = $this->appProperties;
+		if ($root)
 		{
-			$result = $option->value;
+			/*
+			 * Just search the root of the array. Use this if your are sure that
+			 * the property is in the root of the appProperties.
+			 */
+			$result = isset($properties[$property]) ? $properties[$property] : null;
 		}
-		
+		else 
+		{
+			/*
+			 * Search the whole of appProperties for a matching name
+			 */
+			$optionHandler = new ArrayOptionHandler($properties);
+			$option = $optionHandler->getOption($property);
+			
+			if ($option)
+			{
+				$result = $option->value;
+			}
+		}
 		return $result;
 	}
 	
@@ -170,33 +103,45 @@ abstract class AppConfig extends Singleton
 	 *
 	 * @return string
 	 */
-	public static function getAppName()
+	public function getAppName()
 	{
-		return self::getProperty(AppOptions::APP_NAME_TAG);
+		return $this->getProperty(self::APP_NAME_TAG, true);
 	}
 	
 	/**
-	 * Gets the full path of the AppConfig file name loaded;
-	 *
+	 * Gets the domain name from the PHP env.
+	 * 
 	 * @return string
 	 */
-	public static function getFileName()
+	public static function getDomain()
 	{
-		return self::getProperty(AppOptions::CONFIG_FILE_NAME);
+		$prefix = "www.";
+		$domain = $_SERVER["SERVER_NAME"];
+		
+		if (substr($domain, 0, strlen($prefix)) == $prefix) {
+			$domain = substr($domain, strlen($prefix));
+		}
+		
+		return $domain;
 	}
 	
 	/**
-	 * Typically used to append the AppConfig &lt;includePath&gt; option to the PHP include_path.
+	 * This may be used as a basis for the config class file.
 	 *
-	 * @param string $includePath
+	 * @param string $domain
+	 * @return string
 	 */
-	public static function appendIncludePath($includePath)
+	public static function camelCapsDomain($domain)
 	{
-		if ($includePath)
+		$domainName = "";
+		$domainParts = explode(".", $domain);
+		foreach ($domainParts as $domainPart)
 		{
-			$path = get_include_path() . PATH_SEPARATOR . $includePath;
-			set_include_path($path);
+			$domainName .= ucfirst($domainPart);
 		}
+		
+		return $domainName;
 	}
+	
 }
 ?>

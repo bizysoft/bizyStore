@@ -2,9 +2,8 @@
 namespace bizySoft\tests;
 
 use \Exception;
-use bizySoft\bizyStore\model\core\OptimisticOptions;
-use bizySoft\bizyStore\services\core\DBManager;
-use bizySoft\bizyStore\model\unitTest\VersionedMember;
+use bizySoft\bizyStore\model\core\ModelConstants;
+use bizySoft\bizyStore\app\unitTest\VersionedMember;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -15,7 +14,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelOptimisticTestCase extends ModelTestCase
 {
@@ -25,14 +24,15 @@ class ModelOptimisticTestCase extends ModelTestCase
 	private function versionedTest($closure)
 	{
 		$txn = null;
+		$config = self::getTestcaseConfig();
 		/*
 		 * Do for all db's
 		 */
-		foreach (DBManager::getDBIds() as $dbId)
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
 			try
 			{
-				$db = DBManager::getDB($dbId);
+				$db = $config->getDB($dbId);
 				$createDate = $db->getConstantDateTime();
 				$formData = $this->formData->getJackFormData();
 				$formData["dateCreated"] = $createDate;
@@ -73,7 +73,7 @@ class ModelOptimisticTestCase extends ModelTestCase
 				 * 
 				 * Set up the lock property to point to our versioned schema property "version".
 				 */
-				$options = array(OptimisticOptions::OPTION_LOCK_PROPERTY => "version");
+				$options = array(ModelConstants::OPTION_LOCK_PROPERTY => "version");
 				
 				$txn = $db->beginTransaction();
 				$result = $orignalVersionedMember->update($newProperties, $options);
@@ -133,7 +133,7 @@ class ModelOptimisticTestCase extends ModelTestCase
 			}
 			catch (Exception $e)
 			{
-				TestLogger::log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
+				$this->logger->log(__METHOD__ . ": We caught an outer Exception of type " . get_class($e));
 				
 				if ($txn)
 				{

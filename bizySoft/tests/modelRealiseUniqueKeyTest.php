@@ -2,9 +2,8 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\model\unitTest\UniqueKeyMember;
-use bizySoft\bizyStore\model\unitTest\UniqueKeyMembership;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\app\unitTest\UniqueKeyMember;
+use bizySoft\bizyStore\app\unitTest\UniqueKeyMembership;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -25,7 +24,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 {
@@ -62,9 +61,9 @@ class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 			 * Realise a new jack membership, keep the old one to compare
 			 */
 			$realiseJackMembership = new UniqueKeyMembership($nameProperty, $db);
-			TestLogger::startTimer("realise 1");
+			$this->logger->startTimer("realise 1");
 			$jackMembershipArray = $realiseJackMembership->realise(1); // Realise one hop from the UniqueKeyMembership
-			TestLogger::stopTimer("realise 1");
+			$this->logger->stopTimer("realise 1");
 			$this->assertEquals(1, count($jackMembershipArray));
 			$jackMembershipRealised = reset($jackMembershipArray); // First one
 			$this->assertEquals($jackMembership->getSchemaProperties(), $jackMembershipRealised->getSchemaProperties());
@@ -101,9 +100,9 @@ class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 			 * Realise a new jack membership, keep the old one to compare
 			 */
 			$realiseJillMembership = new UniqueKeyMembership($nameProperty, $db);
-			TestLogger::startTimer("realise 1");
+			$this->logger->startTimer("realise 1");
 			$jillMembershipArray = $realiseJillMembership->realise(1); // Realise one hop from the UniqueKeyMembership
-			TestLogger::stopTimer("realise 1");
+			$this->logger->stopTimer("realise 1");
 			$this->assertEquals(1, count($jillMembershipArray));
 			$jillMembershipRealised = reset($jillMembershipArray); // First one
 			$this->assertEquals($jillMembership->getSchemaProperties(), $jillMembershipRealised->getSchemaProperties());
@@ -157,9 +156,9 @@ class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 			 * Realise a new jack, keep the old one to compare
 			 */
 			$realiseJack = new UniqueKeyMember($nameProperty, $db);
-			TestLogger::startTimer("realise 1");
+			$this->logger->startTimer("realise 1");
 			$jackArray = $realiseJack->realise(1); // Realise 1 hop from the parent
-			TestLogger::stopTimer("realise 1");
+			$this->logger->stopTimer("realise 1");
 			$this->assertEquals(1, count($jackArray));
 			$jackRealised = reset($jackArray);
 			$this->assertEquals($jack->getSchemaProperties(), $jackRealised->getSchemaProperties());
@@ -182,13 +181,13 @@ class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 			 * no more data. Here we specify a depth of 10 when the depth of data is actually 1.
 			 */
 			$realiseJack = new UniqueKeyMember($nameProperty, $db);
-			TestLogger::startTimer("realise 10");
+			$this->logger->startTimer("realise 10");
 			/*
 			 * Realise 10 hop's from the parent and turn key indexing on.
 			 */
-			TestLogger::log("Index by key");
+			$this->logger->log("Index by key");
 			$jackArray = $realiseJack->realise(10, array(Model::OPTION_INDEX_KEY => true));
-			TestLogger::stopTimer("realise 10");
+			$this->logger->stopTimer("realise 10");
 			$this->assertEquals(1, count($jackArray));
 			$jackRealised = reset($jackArray);
 			$this->assertEquals($jack->getSchemaProperties(), $jackRealised->getSchemaProperties());
@@ -232,8 +231,10 @@ class ModelRealiseUniqueKeyTestCase extends ModelTestCase
 		$jillData = $this->formData->getJillFormData();
 		$jackData = $this->formData->getJackFormData();
 			
+		$config = self::getTestcaseConfig();
+		
 		$dbId = $db->getDBId();
-		$dbConfig = DBManager::getDBConfig($dbId);
+		$dbConfig = $config->getDBConfig($dbId);
 	
 		$dateCreated = $db->getConstantDateTime();
 		$jillData["dateCreated"] = $dateCreated;

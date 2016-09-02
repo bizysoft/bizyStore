@@ -9,9 +9,9 @@ namespace bizySoft\bizyStore\model\statements;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-interface StatementOptions
+interface StatementConstants
 {
 	/***********************************************************************
 	 * Statement options.

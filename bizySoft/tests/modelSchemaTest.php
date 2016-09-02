@@ -3,12 +3,11 @@ namespace bizySoft\tests;
 
 use bizySoft\tests\services\TestLogger;
 
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\MultiPrimaryKeyMember;
-use bizySoft\bizyStore\model\unitTest\OverlappedUniqueKeyMember;
-use bizySoft\bizyStore\model\unitTest\UniqueKeyMember;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\MultiPrimaryKeyMember;
+use bizySoft\bizyStore\app\unitTest\OverlappedUniqueKeyMember;
+use bizySoft\bizyStore\app\unitTest\UniqueKeyMember;
 use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 
 /**
  *
@@ -19,7 +18,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelSchemaTestCase extends ModelTestCase
 {
@@ -32,8 +31,9 @@ class ModelSchemaTestCase extends ModelTestCase
 		 * They should exist in all the test databases configured with the bizySoft/tests/testData scripts.
 		 * In any case, they exist in the SQLite database configured with the distribution
 		*/
-		$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
-		
+		$config = self::getTestcaseConfig();
+		$modelNamespace = $config->getModelNamespace();
+				
 		return array(
 				array("$modelNamespace\\Member"),
 				array("$modelNamespace\\MultiPrimaryKeyMember"),

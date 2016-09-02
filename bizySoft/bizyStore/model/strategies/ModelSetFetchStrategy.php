@@ -15,7 +15,7 @@ use bizySoft\bizyStore\model\core\Model;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelSetFetchStrategy extends DBAccessStrategy
 {
@@ -39,7 +39,7 @@ class ModelSetFetchStrategy extends DBAccessStrategy
 	 * Can also index the returned array on the most appropriate database key (if specified) with an overhead of around 20%
 	 * when compared to an integer indexed array.
 	 *
-	 * @see \bizySoft\bizyStore\model\statements\DBAccessStrategyI::execute()
+	 * @return array
 	 */
 	public function execute($properties = array())
 	{

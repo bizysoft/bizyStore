@@ -10,7 +10,7 @@ namespace bizySoft\bizyStore\model\statements;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class CRUDPreparedStatementBuilder extends PreparedStatementBuilder
 {
@@ -47,13 +47,13 @@ class CRUDPreparedStatementBuilder extends PreparedStatementBuilder
 	*
 	* @return string
 	*/
-	public final function buildModelInsertStatement($tableName, $properties = array())
+	public final function buildModelInsertStatement($tableName, $properties)
 	{
 		$valuesClause = $this->buildValuesClause($properties);
 		
 		return "INSERT INTO <Q{$tableName}Q> " . $valuesClause;
 	}
-	
+
 	/**
 	* Build a Model UPDATE statement specific to a database table.
 	*
@@ -68,7 +68,7 @@ class CRUDPreparedStatementBuilder extends PreparedStatementBuilder
 		$setClause = $this->buildSetClause($setProperties);
 		$whereClause = $this->buildWhereClause($whereProperties);
 	
-		return "UPDATE <Q{$tableName}Q> SET " . $setClause . ($whereClause ? " WHERE " . $whereClause : "");
+		return $setClause ? "UPDATE <Q{$tableName}Q> SET " . $setClause . ($whereClause ? " WHERE " . $whereClause : "") : null;
 	}
 	
 	/**

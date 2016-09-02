@@ -9,14 +9,14 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class Singleton
 {
 	/**
 	 * Singleton instances based on the derived class.
 	 *
-	 * @var mixed
+	 * @var array
 	 */
 	private static $singletons = array();
 	
@@ -34,14 +34,18 @@ abstract class Singleton
 	 * Gets the singleton instance.
 	 * 
 	 * Calls getDerivedInstance() in the static:: scope to invoke late binding.
+	 * 
+	 * @return mixed
 	 */
-	protected static function getInstance()
+	public static function getInstance()
 	{
 		return static::getDerivedInstance();
 	}
 	
 	/**
 	 * Get the singleton based on the derived class.
+	 * 
+	 * @return mixed
 	 */
 	private static function getDerivedInstance()
 	{

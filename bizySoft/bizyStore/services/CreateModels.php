@@ -4,7 +4,7 @@ namespace bizySoft\bizyStore\services;
 use bizySoft\bizyStore\model\core\Model;
 use bizySoft\bizyStore\model\core\ModelException;
 use bizySoft\bizyStore\model\statements\InsertBulkStatement;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
 
 /**
  * This is as service layer class and is not used by bizyStore core code. Call it an example that can be used to create
@@ -19,7 +19,7 @@ use bizySoft\bizyStore\services\core\DBManager;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class CreateModels
 {
@@ -89,12 +89,13 @@ class CreateModels
 		$pendingTransactions = array();
 		$result = 0;
 		
+		$config = BizyStoreConfig::getInstance();
 		foreach ($this->statements as $dbId => $tableNames)
 		{
-			$db = DBManager::getDB($dbId);
 			$txn = null;
 			try 
 			{
+				$db = $config->getDB($dbId);
 				$txn = $db->beginTransaction();
 				foreach ($tableNames as $tableName => $insertBulkStatement)
 				{

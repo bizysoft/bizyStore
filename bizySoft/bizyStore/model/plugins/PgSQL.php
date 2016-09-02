@@ -2,7 +2,6 @@
 namespace bizySoft\bizyStore\model\plugins;
 
 use \PDO;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 use bizySoft\bizyStore\services\core\Connector;
 
 /**
@@ -13,7 +12,7 @@ use bizySoft\bizyStore\services\core\Connector;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class PgSQL extends Connector
 {
@@ -58,21 +57,21 @@ class PgSQL extends Connector
 		$dsn = "pgsql:";
 		/*
 		 * Mandatory fields.
-		 * These are validated by ConnectionManager and are guaranteed to exist.
+		 * These are validated and are guaranteed to exist.
 		 */
-		$dbName = $dbConfig[BizyStoreOptions::DB_NAME_TAG];
-		$dbUser = $dbConfig[BizyStoreOptions::DB_USER_TAG];
-		$dbPassword = $dbConfig[BizyStoreOptions::DB_PASSWORD_TAG];
+		$dbName = $dbConfig[self::DB_NAME_TAG];
+		$dbUser = $dbConfig[self::DB_USER_TAG];
+		$dbPassword = $dbConfig[self::DB_PASSWORD_TAG];
 		/*
 		 * Optional fields.
 		 * 
 		 * Host is only required for TCP/IP connections, postgreSQL will use the socket configured for localhost if no <host>
 		 * tag is defined in the bizySoftConfig file.
 		 */
-		$dbHost = isset($dbConfig[BizyStoreOptions::DB_HOST_TAG]) ? $dbConfig[BizyStoreOptions::DB_HOST_TAG] : null;
-		$dbOptions = isset($dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG] : null;
-		$dbSchema = isset($dbConfig[BizyStoreOptions::DB_SCHEMA_TAG]) ? $dbConfig[BizyStoreOptions::DB_SCHEMA_TAG] : "";
-		$dbPort = isset($dbConfig[BizyStoreOptions::DB_PORT_TAG]) ? $dbConfig[BizyStoreOptions::DB_PORT_TAG] : null;
+		$dbHost = isset($dbConfig[self::DB_HOST_TAG]) ? $dbConfig[self::DB_HOST_TAG] : null;
+		$dbOptions = isset($dbConfig[self::PDO_OPTIONS_TAG]) ? $dbConfig[self::PDO_OPTIONS_TAG] : null;
+		$dbSchema = isset($dbConfig[self::DB_SCHEMA_TAG]) ? $dbConfig[self::DB_SCHEMA_TAG] : "";
+		$dbPort = isset($dbConfig[self::DB_PORT_TAG]) ? $dbConfig[self::DB_PORT_TAG] : null;
 		/*
 		 * Now build the dsn.
 		 */
@@ -101,7 +100,7 @@ class PgSQL extends Connector
 		 *
 		 * Defaults to 'UNICODE' if not specified, which PostgreSQL understands as being utf-8 encoding.
 		 */
-		$dbCharset = isset($dbConfig[BizyStoreOptions::DB_CHARSET_TAG]) ? $dbConfig[BizyStoreOptions::DB_CHARSET_TAG] : "UNICODE";
+		$dbCharset = isset($dbConfig[self::DB_CHARSET_TAG]) ? $dbConfig[self::DB_CHARSET_TAG] : "UNICODE";
 		$charsetQuery = "set names '$dbCharset'";
 		$db->exec($charsetQuery);
 		

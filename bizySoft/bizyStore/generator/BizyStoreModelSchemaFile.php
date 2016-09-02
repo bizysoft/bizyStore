@@ -1,9 +1,7 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\model\core\SchemaI;
+use bizySoft\bizyStore\model\core\SchemaConstants;
 
 /**
  * Concrete class defining methods that are used for generating the Schema class files via the ModelGenerator.
@@ -21,9 +19,9 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class BizyStoreModelSchemaFile extends ClassFile
+class BizyStoreModelSchemaFile extends ClassFile implements SchemaConstants
 {
 	/**
 	 * @var UniqueProperties
@@ -56,7 +54,7 @@ class BizyStoreModelSchemaFile extends ClassFile
 	 * @param string $tableName        	
 	 * @param string $dbId        	
 	 */
-	public function __construct($className, $dbId)
+	public function __construct($className, $dbId, Config $config = null)
 	{
 		$this->className = $className;
 		$this->dbId = $dbId;
@@ -66,6 +64,7 @@ class BizyStoreModelSchemaFile extends ClassFile
 		$this->foreignProperties = new ForeignProperties();
 		$this->sequencedProperties = new SequencedProperties();
 		$this->columnProperties = new ColumnProperties();
+		parent::__construct($config);
 	}
 
 	/**
@@ -78,14 +77,10 @@ class BizyStoreModelSchemaFile extends ClassFile
 	 */
 	public function generateHeader()
 	{
-		$nameSpace = BizyStoreConfig::getAppName();
+		$config = $this->getConfig();
+		$nameSpace = $config->getModelNamespace();
 		$schemaClassFileContentsHeader = "<?php\n";
-		$schemaClassFileContentsHeader .= "\nnamespace bizySoft\\bizyStore\\model" .
-				 ($nameSpace ? "\\" . $nameSpace : "") . ";\n\n";
-		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\services\\core\\DBManager;\n";
-		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\services\\core\\BizyStoreConfig;\n";
-		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\services\\core\\BizyStoreLogger;\n";
-		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\model\\core\\ModelException;\n";
+		$schemaClassFileContentsHeader .= "\nnamespace $nameSpace;\n\n";
 		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\model\\core\\TableSchema;\n";
 		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\model\\core\\ColumnSchema;\n";
 		$schemaClassFileContentsHeader .= "use bizySoft\\bizyStore\\model\\core\\SequenceSchema;\n";
@@ -116,12 +111,12 @@ class BizyStoreModelSchemaFile extends ClassFile
 			 */
 			foreach ($tableSchema as $index => $columnSchema)
 			{
-				$table_name = $columnSchema[SchemaI::TABLE_NAME];
-				$keyType = $columnSchema[SchemaI::KEY_TYPE];
-				$primary = $keyType == SchemaI::PRIMARY_KEY;
-				$sequenced = $columnSchema[SchemaI::SEQUENCED] == "true";
-				$unique = $keyType == SchemaI::UNIQUE;
-				$foreign = $keyType == SchemaI::FOREIGN_KEY;
+				$table_name = $columnSchema[self::TABLE_NAME];
+				$keyType = $columnSchema[self::KEY_TYPE];
+				$primary = $keyType == self::PRIMARY_KEY;
+				$sequenced = $columnSchema[self::SEQUENCED] == "true";
+				$unique = $keyType == self::UNIQUE;
+				$foreign = $keyType == self::FOREIGN_KEY;
 				
 				if ($primary)
 				{
@@ -204,15 +199,16 @@ class BizyStoreModelSchemaFile extends ClassFile
 	 */
 	private function getConfigForeignColumnSchema($dbId, $columnSchema)
 	{
-		$dbConfig = BizyStoreConfig::getProperty(BizyStoreOptions::DATABASE_TAG);
+		$config = $this->getConfig();
+		$dbConfig = $config->getProperty(self::DATABASE_TAG);
 		$dbConfig = $dbConfig[$dbId];
-		$tableName = $columnSchema[SchemaI::TABLE_NAME];
-		$columnName = $columnSchema[SchemaI::COLUMN_NAME];
+		$tableName = $columnSchema[self::TABLE_NAME];
+		$columnName = $columnSchema[self::COLUMN_NAME];
 		
-		$relationships = isset($dbConfig[BizyStoreOptions::DB_RELATIONSHIPS_TAG]) ? 
-								$dbConfig[BizyStoreOptions::DB_RELATIONSHIPS_TAG] : array();
-		$foreignKeySpecs = isset($relationships[BizyStoreOptions::REL_FOREIGN_KEYS_TAG]) ?
-								$relationships[BizyStoreOptions::REL_FOREIGN_KEYS_TAG] : array();
+		$relationships = isset($dbConfig[self::DB_RELATIONSHIPS_TAG]) ? 
+								$dbConfig[self::DB_RELATIONSHIPS_TAG] : array();
+		$foreignKeySpecs = isset($relationships[self::REL_FOREIGN_KEYS_TAG]) ?
+								$relationships[self::REL_FOREIGN_KEYS_TAG] : array();
 		
 		/*
 		 * Foreign keys are configured as follows under the FOREIGN_KEY_TAG for a database:
@@ -247,11 +243,11 @@ class BizyStoreModelSchemaFile extends ClassFile
 					if (count($referenced) > 1)
 					{
 						$foreignKeyColumns = array();
-						$foreignKeyColumns[SchemaI::KEY_TYPE] = SchemaI::FOREIGN_KEY;
-						$foreignKeyColumns[SchemaI::KEY_NAME] = $index;
-						$foreignKeyColumns[SchemaI::KEY_INDEX] = $i;
-						$foreignKeyColumns[SchemaI::REFERENCED_TABLE] = $referenced[0];
-						$foreignKeyColumns[SchemaI::REFERENCED_COLUMN] = $referenced[1];
+						$foreignKeyColumns[self::KEY_TYPE] = self::FOREIGN_KEY;
+						$foreignKeyColumns[self::KEY_NAME] = $index;
+						$foreignKeyColumns[self::KEY_INDEX] = $i;
+						$foreignKeyColumns[self::REFERENCED_TABLE] = $referenced[0];
+						$foreignKeyColumns[self::REFERENCED_COLUMN] = $referenced[1];
 						/*
 						 * Merge the foreign key info into the columnSchema
 						 */
@@ -298,23 +294,6 @@ class BizyStoreModelSchemaFile extends ClassFile
 		
 		$schemaClassFileContents .= "\tpublic function __construct()\n\t{\n";
 		$comma = "";
-		$schemaClassFileContents .=
-		"\t\tBizyStoreLogger::log(__METHOD__ . \" synching " . $this->className . "\");\n" .
-		"\t\t/* \n" .
-		"\t\t *  Check sync with bizySoftConfig file.\n" .
-		"\t\t * There is a chance that the bizySoftConfig file can be changed without the user\n" .
-		"\t\t * regenerating the classes.\n" .
-		"\t\t * \n" .
-		"\t\t * In this case it's possible for the Id's in bizySoftConfig to become out of sync\n" .
-		"\t\t * to what has been generated in the Model implementation classes. If we can't find\n" .
-		"\t\t * the Id from config, then throw an exception and indicate that the classes require\n" .
-		"\t\t * re-generation.\n" .
-		"\t\t */\n" .
-		"\t\t\$notSynced = array_diff(array_keys(\$this->compatibleDBIds), DBManager::getDBIds());\n" .
-		"\t\tif (\$notSynced)\n" .
-		"\t\t{\n" .
-		"\t\t\tthrow new ModelException(__METHOD__ . \": Class files not in sync with \" . BizyStoreConfig::getFileName() . \": Config = \" . print_r(DBManager::getDBIds(), true) . \", diff = \" . print_r(\$notSynced, true));\n" .
-		"\t\t}\n";
 		
 		/*
 		 * Table name mappings.
@@ -407,11 +386,11 @@ class BizyStoreModelSchemaFile extends ClassFile
 		 * Sequenced column
 		 * Unique Key non-sequenced
 		 */
-		$stashKeyCandidate($primaryKeyCandidates[SchemaProperties::SEQUENCED]);
-		$stashKeyCandidate($primaryKeyCandidates[SchemaProperties::NON_SEQUENCED]);
-		$stashKeyCandidate($uniqueKeyCandidates[SchemaProperties::SEQUENCED]);
-		$stashKeyCandidate($sequencedKeyCandidates[SchemaProperties::SEQUENCED]);
-		$stashKeyCandidate($uniqueKeyCandidates[SchemaProperties::NON_SEQUENCED]);
+		$stashKeyCandidate($primaryKeyCandidates[self::SEQUENCED]);
+		$stashKeyCandidate($primaryKeyCandidates[self::NON_SEQUENCED]);
+		$stashKeyCandidate($uniqueKeyCandidates[self::SEQUENCED]);
+		$stashKeyCandidate($sequencedKeyCandidates[self::SEQUENCED]);
+		$stashKeyCandidate($uniqueKeyCandidates[self::NON_SEQUENCED]);
 		
 		$schemaClassFileContents .= "\t\t\$this->keyCandidateSchema = new KeyCandidateSchema(\n\t\t\tarray(";
 		$schemaClassFileContents .= $this->uniqueProperties->stringify($keyCandidates);

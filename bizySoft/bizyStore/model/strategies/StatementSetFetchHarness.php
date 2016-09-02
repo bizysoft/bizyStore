@@ -15,7 +15,7 @@ use bizySoft\bizyStore\model\core\StatementException;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class StatementSetFetchHarness extends StatementAccessHarness
 {
@@ -40,6 +40,7 @@ class StatementSetFetchHarness extends StatementAccessHarness
 	 * Clean up by closing the statement.
 	 *
 	 * @param callable $closure
+	 * @return mixed
 	 * @throws ModelException
 	 */
 	public function harness($closure)

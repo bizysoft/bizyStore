@@ -1,8 +1,6 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\SchemaI;
-
 /**
  * This class is used for storing foreign key references, keyed on a database id.
  * 
@@ -17,7 +15,7 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ReferencedProperties extends SchemaProperties
 {
@@ -25,6 +23,8 @@ class ReferencedProperties extends SchemaProperties
 	 * Generate the code to support referenced foreign key columns for a single-table instance keyed on the dbId.
 	 * 
 	 * Only used for single-table instances.
+	 * 
+	 * @return string
 	 */
 	public function codify()
 	{
@@ -37,6 +37,7 @@ class ReferencedProperties extends SchemaProperties
 	 * Stringify the referenced foreign key information as code.
 	 * 
 	 * @param array $referencedProperties
+	 * @return string
 	 */
 	public function stringify($referencedProperties)
 	{
@@ -70,6 +71,8 @@ class ReferencedProperties extends SchemaProperties
 	}
 	/**
 	 * Transform the schema column data into the required form for code generation.
+	 * 
+	 * @return array
 	 */
 	public function transform()
 	{
@@ -79,13 +82,13 @@ class ReferencedProperties extends SchemaProperties
 		{
 			foreach($columnSchema as $columnProperties)
 			{
-				$referringTableName = $columnProperties[SchemaI::TABLE_NAME];
-				$referringColumnName = $columnProperties[SchemaI::COLUMN_NAME];
-				$columnName = $columnProperties[SchemaI::REFERENCED_COLUMN];
+				$referringTableName = $columnProperties[self::TABLE_NAME];
+				$referringColumnName = $columnProperties[self::COLUMN_NAME];
+				$columnName = $columnProperties[self::REFERENCED_COLUMN];
 				/*
 				 * Some databases use a true index name others just a numeric index.
 				 */
-				$indexName = $columnProperties[SchemaI::KEY_NAME];
+				$indexName = $columnProperties[self::KEY_NAME];
 				
 				if(!isset($referencedProperties[$dbId]))
 				{
@@ -112,6 +115,7 @@ class ReferencedProperties extends SchemaProperties
 	 * 
 	 * @param string $dbId
 	 * @param string $requiredTableName
+	 * @return array
 	 */
 	public function getReferencedProperties($dbId, $requiredTableName)
 	{
@@ -120,7 +124,7 @@ class ReferencedProperties extends SchemaProperties
 		$columnSchema = isset($this->properties[$dbId]) ? $this->properties[$dbId] : array();
 		foreach($columnSchema as $columnProperties)
 		{
-			$tableName = $columnProperties[SchemaI::REFERENCED_TABLE];
+			$tableName = $columnProperties[self::REFERENCED_TABLE];
 			if ($tableName === $requiredTableName)
 			{
 				if(!isset($referencedProperties[$dbId]))

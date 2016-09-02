@@ -1,6 +1,8 @@
 <?php
 namespace bizySoft\bizyStore\model\plugins;
 
+use \PDO;
+use bizySoft\bizyStore\services\core\Config;
 use bizySoft\bizyStore\model\core\PDODB;
 use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
 
@@ -14,7 +16,7 @@ use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class MySQL_PDODB extends PDODB
 {
@@ -54,14 +56,15 @@ class MySQL_PDODB extends PDODB
         ORDER BY ordinalPosition";
 	
 	/**
-	 * Pass the database parameters in an associative array and use them to construct the connection.
+	 * Just pass the database parameters and config.
 	 *
-	 * @param array $dbConfig <p>an associative array containing the
-	 *        database config information supplied in bizySoftConfig.</p>
+	 * @param PDO $db
+	 * @param string $dbId
+	 * @param Config $config
 	 */
-	public function __construct($dbConfig)
+	public function __construct(PDO $db, $dbId, Config $config)
 	{
-		parent::__construct($dbConfig);
+		parent::__construct($db, $dbId, $config);
 	}
 		
 	/**

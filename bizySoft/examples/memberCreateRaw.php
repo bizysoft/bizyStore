@@ -1,6 +1,7 @@
 <?php
 use \Exception;
 use \PDO;
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
 use bizySoft\bizyStore\services\core\ConnectionManager;
 
 /**
@@ -10,13 +11,15 @@ use bizySoft\bizyStore\services\core\ConnectionManager;
  * 
  * http://yourserver/memberEntryRaw.html
  *
- * This is an entry/top level php file called by a form action. It's the raw version of memberCreate.php 
- * without any Model, Schema, DB or Statement support. The amount of database code you have to write is 4X that 
- * of bizyStore code for the same result (see memberCreate.php). 
+ * This is an entry/top level php file called by a form action. You should realise that this is just an example, so does not comply
+ * with best practices of producing a web page via PHP.
  * 
- * Reading the code functionally, exception handling and managing result sets is more difficult. Only ConnectionManager 
- * has support for multiple database vendors, the rest of the code does not. Here we assume that you are using the 
- * standard SQLite database that comes with the distribution.
+ * It's the raw version of "memberCreate.php". Because we don't use any Models, it does not rely on Model, Schema, DB or Statement 
+ * support. The amount of database code you have to write is 4X that of bizyStore code for the same result (see memberCreate.php). 
+ * 
+ * Reading the code functionally, exception handling and managing result sets is more difficult than "memberCreate.php". 
+ * Only ConnectionManager has support for multiple database vendors, the rest of the code does not. Here we assume that 
+ * you are using the standard SQLite database that comes with the distribution.
  *
  * It can use the bizySoftConfig file (bizySoft/config/bizyStoreExample.xml) as a basis which
  * is provided in the distribution. You will need to change the path to the database in this file to suit
@@ -29,14 +32,14 @@ use bizySoft\bizyStore\services\core\ConnectionManager;
  * This eliminates problems with namespaces, use statements and include calls etc...
  * 
  * It's recommended practice for the bizySoft directory to be OUTSIDE the web server's DOCUMENT_ROOT. You must still give your 
- * web server write access to the bizySoft directories for logging if required.
+ * web server write access to some bizySoft directories for logging etc, if required.
  * 
  * <span style="color:orange">If you find our software helpful, the best way to contribute
  * is to hire us to work for you. </span> Details at <a href="http://www.bizysoft.com.au">http://www.bizysoft.com.au</a>
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 
 /*
@@ -46,12 +49,12 @@ use bizySoft\bizyStore\services\core\ConnectionManager;
  *
  * str_replace() handles both 'nix and Windows file systems.
  */
-include str_replace("/", DIRECTORY_SEPARATOR, "bizySoft/bizyStore/services/core/bootstrapRaw.php");
+include str_replace("/", DIRECTORY_SEPARATOR, "bizySoft/bizyStore/services/core/bootstrap.php");
 
 echo "<!DOCTYPE html>";
 echo "<html>";
 echo "<head>";
-echo "<meta charset='utf-8'>";
+echo "<meta charset=\"utf-8\">";
 echo "</head>";
 echo "<body>";
 
@@ -73,22 +76,23 @@ try
 	 * still uses the bizySoftConfig file, but you don't have to use all bizyStore's features if you don't need to, 
 	 * so ConnectionManager returns a standard PDO object.
 	 * 
-	 * Using ConnectionManager in conjunction with 'bootstrapRaw.php' will not load all of bizyStore's core code. 
-	 * It gives you the flexibility to work the way you want with the connection. The down side is you have to write a lot
-	 * more code which will most probably end up being database specific which can be fine if you only intend to use a 
-	 * single database vendor. You will run into problems if you decide to change vendors, or use multiple databases from 
-	 * different vendors.
+	 * This example does not use Models so will not load all of bizyStore's core code. It gives you the flexibility to work 
+	 * the way you want with the connection. The down side is you have to write a lot more code which will most probably end 
+	 * up being database specific which can be fine if you only intend to use a single database vendor. You will run into 
+	 * problems if you decide to change vendors, or use multiple databases from different vendors.
 	 * 
 	 * Usually a raw connection takes a decent amount of code to setup if you need to do it properly, even just for one database
-	 * vendor. Because the database is still configured from the bizySoftConfig file, you wont see any raw connection details 
+	 * vendor. Because the database is still configured from the bizySoftConfig file, you won't see any raw connection details 
 	 * which you would normally have to supply somehow.
 	 * 
-	 * Here it's a one-liner that will handle databases from all our supported vendors and allows you to access the same
-	 * connection from anywhere in your code just as easily as we have shown here.
-	 * 
+	 * Here it takes very little code to handle databases from all our supported vendors.
+	 */
+	$config = BizyStoreConfig::getInstance();
+	$connectionManager = new ConnectionManager($config->getDBConfig());
+	/*
 	 * Database "A" is the database <id> from the bizyStoreConfig file.
 	 */
-	$db = ConnectionManager::getConnection("A");
+	$db = $connectionManager->getConnection("A");
 	/*
 	 * Get the time from the database
 	 */
@@ -106,8 +110,8 @@ try
 	 *
 	 * These are all issues that bizyStore transparently handles for you.
 	 * 
-	 * You would normally need to validate the $_POST form data before storing in the db, this is just an example so 
-	 * we don't.
+	 * You would normally need to validate the $_POST form data before storing in the db, this example uses prepared statements 
+	 * so data is already safe from SQL injection issues. 
 	 */
 	$memberValues = $_POST;
 	$memberValues["dateCreated"] = $dateCreated["CURRENT_TIMESTAMP"];
@@ -133,7 +137,7 @@ try
 	 * in an undefined state.
 	 * 
 	 * We are not using bizyStore methods here, so the code is more dependent on the setting for PDO::ATTR_ERRMODE supplied 
-	 * in the config file. In this case we should manually check for a false execute() result as well in case PDO::ATTR_ERRMODE
+	 * in the config file. In this case we should manually check for a false execute() result as well, in case PDO::ATTR_ERRMODE
 	 * is changed.
 	 * 
 	 * Prepare the statement and hold a reference to it.
@@ -146,7 +150,6 @@ try
 	}
 	$db->beginTransaction();
 	/*
-	 * 
 	 * Store all the properties that have been set into the database.
 	 */
 	$result = $preparedStatement->execute($memberValues);

@@ -1,18 +1,22 @@
 <?php
 namespace bizySoft\bizyStore\model\core;
 
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
+
 /**
  * Delegates the required Model method calls to the generated schema class instance.
  * 
  * It stores the required components for the delegation and also acts to decouple database specifics from the 
- * Model class.
+ * Model parent. 
+ * 
+ * Generated Model classes extend this class.
  *
  * <span style="color:orange">If you find our software helpful, the best way to contribute
  * is to hire us to work for you. </span> Details at <a href="http://www.bizysoft.com.au">http://www.bizysoft.com.au</a>
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class ModelSchema extends Model
 {
@@ -41,17 +45,35 @@ abstract class ModelSchema extends Model
 	 * Instances of this class are constructed under controlled conditions from the generated Model class.
 	 * 
 	 * @param array $properties The properties for this Model.
-	 * @param DB $db A reference to the database for this Model.
 	 * @param Schema $schema A reference to the Schema for this Model.
+	 * @param DB $db A reference to the database for this Model.
+	 * 
+	 * @throws ModelException if Model is incompatible with the db specified.
 	 */
-	public function __construct($properties, $db, $schema)
+	public function __construct(array $properties, $schema, DB $db = null)
 	{
-		$this->db = $db;
-		$this->dbId = $db->getDBId();
 		/*
-		 * Set a reference to the schema common to this Model.
+		 * Set the schema first
 		 */
 		$this->schema = $schema;
+		if ($db)
+		{
+			$this->dbId = $db->getDBId();
+			if (!$this->isCompatible($this->dbId))
+			{
+				throw new ModelException(" Model class is not compatible with database " . $this->dbId);
+			}
+			$this->db = $db;
+		}
+		else
+		{
+			/*
+			 * The default database will always be compatible
+			 */
+		 	$this->db = $this->getDefaultDB();
+			$this->dbId = $this->db->getDBId();
+		}
+		
 		parent::__construct($properties);
 	}
 
@@ -147,6 +169,7 @@ abstract class ModelSchema extends Model
 	 * Is this schema compatible with the database Id.
 	 * 
 	 * @param string $dbId
+	 * @return boolean
 	 */
 	public function isCompatible($dbId)
 	{
@@ -159,6 +182,16 @@ abstract class ModelSchema extends Model
 	public function getDefaultDBId()
 	{
 		return $this->schema->defaultDBId;
+	}
+	
+	/**
+	 * @see bizySoft\bizyStore\model\core.ModelI::getDefaultDB()
+	 */
+	public function getDefaultDB()
+	{
+		$config = BizyStoreConfig::getInstance();
+		
+		return $config->getDB($this->getDefaultDBId());
 	}
 }
 

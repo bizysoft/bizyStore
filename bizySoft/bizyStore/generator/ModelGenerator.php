@@ -1,12 +1,9 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\ModelException;
-use bizySoft\bizyStore\model\core\SchemaI;
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreLogger;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\model\core\SchemaConstants;
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Class to allow generation of bizyStore Model and Schema classes supporting your application's database(s).
@@ -17,18 +14,20 @@ use bizySoft\bizyStore\services\core\DBManager;
  * This class uses the database schema information to produce the required PHP classes for retrieval and storage of data.
  * It uses the database config items specified in the bizySoftConfig file for your application.
  *
- * Generation produces two sets of files, &lt;Model&gt;.php and &lt;Model&gt;Schema.php in the "bizySoft/bizyStore/model/&lt;appName&gt;" 
- * directory. Where &lt;Model&gt; is the PHP class name representing a table in your database and &lt;appName&gt; is from the bizySoftConfig file.
+ * Generation produces two sets of files, &lt;Model&gt;.php and &lt;Model&gt;Schema.php in the "bizySoft/bizyStore/app/&lt;appName&gt;" 
+ * directory. Where &lt;Model&gt; is the PHP class name representing a table in your database and &lt;appName&gt; is from bizySoftConfig.
  *
  * <span style="color:orange">If you find our software helpful, the best way to contribute
  * is to hire us to work for you. </span> Details at <a href="http://www.bizysoft.com.au">http://www.bizysoft.com.au</a>
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class ModelGenerator
+class ModelGenerator extends Generator implements BizyStoreConstants, SchemaConstants
 {
+	private $config;
+	
 	/**
 	 * The set of ClassFiles that represent the Model classes we are generating.
 	 *
@@ -44,12 +43,18 @@ class ModelGenerator
 	private $classSchemaFileSet;
 	
 	/**
+	 * All the table names that we are referencing.
+	 */
+	private $allDBTableNames;
+	
+	/**
 	 * Set the class variables.
 	 */
-	public function __construct()
+	public function __construct(Config $config)
 	{
-		$this->classFileSet = new BizyStoreModelFileSet();
-		$this->classSchemaFileSet = new BizyStoreModelSchemaFileSet();
+		$this->classFileSet = new BizyStoreModelFileSet($config);
+		$this->classSchemaFileSet = new BizyStoreModelSchemaFileSet($config);
+		$this->config = $config;
 	}
 	
 	/**
@@ -66,11 +71,11 @@ class ModelGenerator
 	{
 		$result = array();
 		
-		$dbIds = DBManager::getDBIds();
+		$dbConfig = $this->config->getDBConfig();
 
-		foreach ($dbIds as $dbId)
+		foreach ($dbConfig as $dbId => $config)
 		{
-			$db = DBManager::getDB($dbId);
+			$db = $this->config->getDB($dbId);
 			$tableNames = $db->getTableNames();
 			$result[$dbId] = $tableNames;
 		}
@@ -89,14 +94,17 @@ class ModelGenerator
 	{
 		$tableLock = array();
 		
-		$dbTablesToProcess = $dbTables ? $dbTables : $this->getAllDBTables();
+		$this->allDBTableNames = $this->getAllDBTables();
+		$dbTablesToProcess = $dbTables ? $dbTables : $this->allDBTableNames;
+		$config = $this->config;
+		$logger = $config->getLogger();
 		// Sort out the class files that we need to support the configured databases
 		foreach ($dbTablesToProcess as $dbId => $tableNames)
 		{
+			$db = $config->getDB($dbId);
 			foreach ($tableNames as $tableName)
 			{
-				BizyStoreLogger::log("Processing $dbId:$tableName");
-				$db = DBManager::getDB($dbId);
+				$logger->log("Processing $dbId:$tableName");
 				// Get the schema for each table.
 				$tableSchema = $db->getSchema($tableName);
 				if ($tableSchema)
@@ -155,9 +163,8 @@ class ModelGenerator
 	/**
 	 * Control the generation of the class files with respect to bizySoftConfig settings.
 	 * 
-	 * The Model and Schema class files are stored in "bizySoft/bizyStore/model/&lt;appName&gt;"
-	 * Where &lt;appName&gt; is specified in the bizySoftConfig file. Appropriate permissions should be given to this 
-	 * directory so the web server or CLI program can write to it.
+	 * The Model and Schema class files are stored in "bizySoft/bizyStore/app/&lt;appName&gt;"
+	 * Appropriate permissions should be given to this directory so the web server or CLI program can write to it.
 	 * 
 	 * Class generation is usually automatic, being handled by the auto-loader. In this case generate() is called
 	 * by the auto-loader with no parameters, so all tables from all databases configured will have Model and Schema
@@ -173,37 +180,25 @@ class ModelGenerator
 	 * generate and put in your code repository.
 	 * 
 	 * If your database schema or bizySoftConfig file has changed, then regeneration of class files may be 
-	 * necessary. This can be done simply by removing the "bizySoft/bizyStore/model/&lt;appName&gt;" directory
+	 * necessary. This can be done simply by removing the "bizySoft/bizyStore/app/&lt;appName&gt;" directory and your config 
+	 * class file in bizySoft/bizyStore/config.
+	 * 
 	 * or re-generating manually.
 	 * 
 	 * @param $dbTables an associative array of array("dbId1" => array("table1", "table2", ...), "dbId2" => array(...), ...)
-	 * @throws ModelException
 	 */
 	public function generate(array $dbTables = array())
 	{
-		$modelDir = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_DIR);
+		$config = $this->config;
+		$modelBaseDir = $config->getProperty(self::BIZYSTORE_MODEL_BASE_DIR, true);
+		$modelDir = $config->getProperty(self::BIZYSTORE_MODEL_DIR, true);
 		
-		if (!file_exists($modelDir))
-		{
-			if (!mkdir($modelDir))
-			{
-				/*
-				 * We can't create the required model directory, so bail.
-				 */
-				throw new ModelException("Unable to create $modelDir");
-			}
-		}
+		$this->createDirectory($modelBaseDir);
+		$this->createDirectory($modelDir);
 		
-		if (!is_writable($modelDir))
-		{
-			/*
-			 * We need to throw here because we have no place to write the class files.
-			 */
-			throw new ModelException("Unable to write class files to $modelDir");
-		}
-		
-		BizyStoreLogger::log("Starting Model generation");
-		BizyStoreLogger::log("Generating Model class files.");
+		$logger = $this->config->getLogger();
+		$logger->log("Starting Model generation");
+		$logger->log("Generating Model class files.");
 		/*
 		 * Init the classFileSets
 		 */
@@ -216,10 +211,10 @@ class ModelGenerator
 			$fileContents = $classFile->generateFile();
 			$fileName = $modelDir . DIRECTORY_SEPARATOR . $classFile->getFileName();
 			file_put_contents($fileName, $fileContents);
-			BizyStoreLogger::log(__METHOD__ . ": Generating $fileName");
+			$logger->log(__METHOD__ . ": Generating $fileName");
 		}
 		
-		BizyStoreLogger::log("Generating Schema class files.");
+		$logger->log("Generating Schema class files.");
 		/*
 		 * The schema is generated a little differently. We populate the schema and add any foreign keys to the 
 		 * $referencedProperties object, producing a multi-table instance. 
@@ -235,7 +230,7 @@ class ModelGenerator
 			$foreignProperties = $foreignKeys->getProperties();
 			foreach ($foreignProperties as $dbId => $columnSchema)
 			{
-				$dbConfig = DBManager::getDBConfig($dbId);
+				$dbConfig = $this->config->getDBConfig($dbId);
 				/*
 				 * Recursive relationship declarations are ignored in the schema generation for ForeignKeyReferee's.
 				 * 
@@ -245,15 +240,15 @@ class ModelGenerator
 				 *     
 				 * Here we disallow any ForeignKeyReferee's having a <recursive> declaration.
 				 */
-				$relationships = isset($dbConfig[BizyStoreOptions::DB_RELATIONSHIPS_TAG]) ?
-										$dbConfig[BizyStoreOptions::DB_RELATIONSHIPS_TAG] : array();
-				$recursives = isset($relationships[BizyStoreOptions::REL_RECURSIVE_TAG]) ?
-										$relationships[BizyStoreOptions::REL_RECURSIVE_TAG] : array();
+				$relationships = isset($dbConfig[self::DB_RELATIONSHIPS_TAG]) ?
+										$dbConfig[self::DB_RELATIONSHIPS_TAG] : array();
+				$recursives = isset($relationships[self::REL_RECURSIVE_TAG]) ?
+										$relationships[self::REL_RECURSIVE_TAG] : array();
 				
 				foreach ($columnSchema as $columnProperties)
 				{
-					$referencedTable = $columnProperties[SchemaI::TABLE_NAME];
-					$referencedColumn = $columnProperties[SchemaI::COLUMN_NAME];
+					$referencedTable = $columnProperties[self::TABLE_NAME];
+					$referencedColumn = $columnProperties[self::COLUMN_NAME];
 					$resursiveKey = $referencedTable . "." . $referencedColumn;
 					if (!isset($recursives[$resursiveKey]))
 					{
@@ -267,9 +262,49 @@ class ModelGenerator
 			$fileContents = $classFileSchema->generateFile($referencedProperties);
 			$fileName = $modelDir . DIRECTORY_SEPARATOR . $classFileSchema->getFileName();
 			file_put_contents($fileName, $fileContents);
-			BizyStoreLogger::log(__METHOD__ . ": Generating $fileName");
+			$logger->log(__METHOD__ . ": Generating $fileName");
 		}
-		BizyStoreLogger::log("Finished Model generation");
+		/*
+		 * Write the ReferencedTables singleton file.
+		 */
+		$fileName = $modelDir . DIRECTORY_SEPARATOR . "ReferencedTables.php";
+		$fileContents = $this->generateReferencedTablesFile();
+		file_put_contents($fileName, $fileContents);
+		
+		$logger->log("Finished Model generation");
+	}
+	
+	private function generateReferencedTablesFile()
+	{
+		$config = $this->config;
+		$nameSpace = $config->getModelNamespace();
+		$classFileContents = "<?php\n" .
+		 		"\nnamespace $nameSpace;\n".
+				"\nclass ReferencedTables\n" . 
+				"{\n" .
+				"\tprivate \$tableNames = array(\n";
+		$outerComma = "";
+		foreach ($this->allDBTableNames as $db => $tableNames)
+		{
+			$classFileContents .= $outerComma . "\"$db\" => array(\n";
+			$comma = "";
+			foreach ($tableNames as $tableName)
+			{
+				$classFileContents .= $comma . "\"$tableName\" => \"$tableName\"\n";
+				$comma = ",";
+			}
+			$classFileContents .= ")\n";
+			$outerComma = ",";
+		}
+		$classFileContents .= ");\n\n" .
+
+		"\tpublic function getTables(\$dbId)\n" .
+		"\t{\n" .
+			"\t\treturn isset(\$this->tableNames[\$dbId]) ? \$this->tableNames[\$dbId] : array();\n" .
+		"\t}\n}\n" .
+		"?>\n";
+		
+		return $classFileContents;
 	}
 }
 

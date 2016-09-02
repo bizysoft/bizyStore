@@ -22,7 +22,7 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class KeyCandidateSchema extends Schema
 {
@@ -83,7 +83,7 @@ class KeyCandidateSchema extends Schema
 	 * 
 	 * @param string $dbId the database id from bizySoftConfig.
 	 * @param array $properties an associative array of (propertyName => value, etc... ) 
-	 * @rerun string
+	 * @return string
 	 */
 	public function getKeyValuesAsString($dbId, $properties)
 	{

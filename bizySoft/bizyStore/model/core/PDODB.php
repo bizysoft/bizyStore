@@ -1,14 +1,15 @@
 <?php
+
 namespace bizySoft\bizyStore\model\core;
 
 use \Exception;
+use \PDO;
 use bizySoft\bizyStore\model\statements\QueryStatement;
 use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
 use bizySoft\bizyStore\model\strategies\DBQueryStrategy;
 use bizySoft\bizyStore\model\strategies\DBExecuteStrategy;
 use bizySoft\bizyStore\model\strategies\DBPrepareStrategy;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\ConnectionManager;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Acts as an intermediary between PDO and the implementing bizyStore classes.
@@ -22,7 +23,7 @@ use bizySoft\bizyStore\services\core\ConnectionManager;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class PDODB extends DB
 {	
@@ -131,22 +132,21 @@ abstract class PDODB extends DB
 	protected $isolationLevelMap = array();
 	
 	/**
-	 * Construct with database parameters from bizySoftConfig.
-	 *
-	 * Just pass through the config.
-	 *
-	 * @param array $dbConfig an associative array containing the specific database config information supplied in bizySoftConfig.
-	 * @throws Exception if no connection can be established with current config.
-	 */
-	public function __construct($dbConfig)
-	{
-		parent::__construct($dbConfig);
+	 * Construct with database parameters and config.
 
-		$this->connect();
+	 * @param PDO $db
+	 * @param string $dbId
+	 * @param Config $config
+	 */
+	public function __construct(PDO $db, $dbId, Config $config)
+	{
+		$this->db = $db;
+		
+		parent::__construct($dbId, $config);
 		$this->timestamp = $this->getDateTime(); // Set a timestamp for consistent CRUD dates/times.
 		$this->setIsolationLevelMap();
 	}
-	
+		
 	/**
 	 * This maps the SQL standard isolation levels to the database vendors implementation.
 	 *
@@ -221,18 +221,6 @@ abstract class PDODB extends DB
 		return "set session transaction isolation level " . $isolationLevel;
 	}
 			
-	/**
-	 * Establish a connection to the database if required.
-	 * 
-	 * @throws Exception if no connection can be established with current config.
-	 */
-	public function connect()
-	{
-		if (!$this->db)
-		{
-			$this->db = ConnectionManager::getConnection($this->getDBId());
-		}
-	}
 	/**
 	 * Get the PDO connection to the database that this DB refers to.
 	 *
@@ -425,7 +413,7 @@ abstract class PDODB extends DB
 	 * 
 	 * Note that isolation levels only have an effect on the base transaction.
 	 * 
-	 * @see bizySoft\bizyStore\model\core.DBI::transact()
+	 * @return mixed
 	 */
 	public function transact($closure, $isolationLevel = null)
 	{
@@ -519,7 +507,7 @@ abstract class PDODB extends DB
 	 *
 	 * Uses PDO's impementation
 	 *
-	 * @return true if there is a transaction in progress, false otherwise.
+	 * @return boolean true if there is a transaction in progress, false otherwise.
 	 */
 	public function hasTransaction()
 	{
@@ -547,7 +535,7 @@ abstract class PDODB extends DB
 	/**
 	 * Gets the number of counts that have occurred.
 	 * 
-	 * @return number
+	 * @return integer
 	 */
 	public function getCount()
 	{
@@ -586,7 +574,6 @@ abstract class PDODB extends DB
 		{
 			$this->endTransaction($mode);
 		}
-		ConnectionManager::close($this->getDBId());
 		$this->db = null;
 		
 		return $mode;
@@ -602,12 +589,14 @@ abstract class PDODB extends DB
 	public function getTableNames()
 	{
 		$result = array();
-		$dbConfig = ConnectionManager::getDBConfig($this->getDBId());
-	
+		$config = $this->getConfig();
+		$dbConfigs = $config->getProperty(self::DATABASE_TAG);
+		$dbConfig = $dbConfigs[$this->getDBId()];
+			
 		/*
 		 * Only use the tables specified in the bizySoftConfig file if any.
 		 */
-		$configTables = isset($dbConfig[BizyStoreOptions::DB_TABLES_TAG]) ? $dbConfig[BizyStoreOptions::DB_TABLES_TAG] : null;
+		$configTables = isset($dbConfig[self::DB_TABLES_TAG]) ? $dbConfig[self::DB_TABLES_TAG] : null;
 	
 		if ($configTables)
 		{
@@ -684,7 +673,7 @@ abstract class PDODB extends DB
 	 *
 	 * @param string $sequenceName
 	 *
-	 * @return string|NULL
+	 * @return string
 	 */
 	public function getCurrentSequence($sequenceName)
 	{

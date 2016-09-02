@@ -9,9 +9,9 @@ namespace bizySoft\bizyStore\services\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-interface ConnectorI
+interface ConnectorI extends BizyStoreConstants
 {
 	/**
 	 * Connect to the database with a configuration.
@@ -20,6 +20,7 @@ interface ConnectorI
 	 * to make sure that all fields are correct for the interface used.
 	 * 
 	 * @param string $dbId.
+	 * @return \PDO
 	 * @param array $dbConfig Use this config to connect.
 	 */
 	public function connect(array $dbConfig);

@@ -12,47 +12,10 @@ use bizySoft\common\ValidationErrors;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class Connector implements ConnectorI
-{
-	/**
-	 * The connection to the database
-	 * @var PDO
-	 */
-	private $connection = null;
-	
-	/**
-	 * Gets the connection status. Is this Connector actually connected to a database.
-	 * 
-	 * Connections are "on demand" so there is no requirement that a Connector be connected to a database until it
-	 * needs to be.
-	 */
-	public function isConnected()
-	{
-		return $this->connection != null;
-	}
-	
-	/**
-	 * Gets the connection for this Connector.
-	 * 
-	 * @return PDO
-	 */
-	public function getConnection()
-	{
-		return $this->connection;
-	}
-	
-	/**
-	 * Sets the connection for this Connector.
-	 * 
-	 * @param PDO $connection can be null to close the connection.
-	 */
-	public function setConnection(PDO $connection = null)
-	{
-		$this->connection = $connection;
-	}
-	
+{	
 	/**
 	 * These are the most common config validations for databases.
 	 *
@@ -68,8 +31,8 @@ abstract class Connector implements ConnectorI
 	{
 		$mandatoryFields = array();
 	
-		$mandatoryFields[BizyStoreOptions::DB_USER_TAG] = isset($dbConfig[BizyStoreOptions::DB_USER_TAG]) ? $dbConfig[BizyStoreOptions::DB_USER_TAG] : null;
-		$mandatoryFields[BizyStoreOptions::DB_PASSWORD_TAG] = isset($dbConfig[BizyStoreOptions::DB_PASSWORD_TAG]) ? $dbConfig[BizyStoreOptions::DB_PASSWORD_TAG] : null;
+		$mandatoryFields[self::DB_USER_TAG] = isset($dbConfig[self::DB_USER_TAG]) ? $dbConfig[self::DB_USER_TAG] : null;
+		$mandatoryFields[self::DB_PASSWORD_TAG] = isset($dbConfig[self::DB_PASSWORD_TAG]) ? $dbConfig[self::DB_PASSWORD_TAG] : null;
 	
  		/*
 		 * Validate each field

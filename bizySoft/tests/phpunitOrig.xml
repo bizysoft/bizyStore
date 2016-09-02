@@ -22,6 +22,20 @@
 			<directory>.</directory>
 		</testsuite>
 	</testsuites>
+	<filter>
+      <whitelist>
+        <directory suffix=".php">../</directory>
+        <!-- Exclude files we don't want code coverage on -->
+        <exclude>
+          <directory suffix=".php">../tests</directory>
+          <directory suffix=".php">../examples</directory>
+          <!-- Generated classes -->
+          <directory suffix=".php">../bizyStore/app</directory>
+          <directory suffix=".php">../bizyStore/config</directory>
+        </exclude>
+      </whitelist>
+    </filter>
+	
 <!-- 
 	<logging>
 		<log type="coverage-html" target="/path/to/codeCoverageDirectory" charset="UTF-8"
@@ -30,7 +44,7 @@
 	</logging>
 -->
 	<php>
-		<server name="SERVER_NAME" value="unitTest" /> <!-- load the bizySoftConfig_unitTest.xml file -->
+		<server name="SERVER_NAME" value="unitTest" /> <!-- load the bizySoft/config/unitTest.xml file -->
 		<ini name="date.timezone" value="Australia/Melbourne" />
 		<ini name="log_errors" value="on" />
 		<ini name="include_path" value="/path/to/bizySoft" />

@@ -1,8 +1,7 @@
 <?php
 namespace bizySoft\tests;
 
-use bizySoft\bizyStore\services\core\DBManager;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
+use bizySoft\bizyStore\services\core\BizyStoreConfig;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -13,7 +12,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class DBInitTestCase extends ModelTestCase
 {
@@ -23,33 +22,36 @@ class DBInitTestCase extends ModelTestCase
 	 */
 	public function testDBInit()
 	{
-		// Make sure we are starting from scratch
-		DBManager::reset();
-		$config = DBManager::getDBConfig();
+		/*
+		 * Make sure we are starting from scratch.
+		 */
 		
-		$configKeys = array_keys($config);
-		$dbIds = DBManager::getDBIds();
-		// And the result should be the same as above
-		$diff = array_diff($configKeys, $dbIds);
-		$this->assertTrue(empty($diff));
+		$config = self::getTestcaseConfig();
+		
+		$config->closeDBs();
+		/*
+		 * Get all the database config.
+		 */
+		$dbConfig = $config->getDBConfig();
+		$dbIds = array_keys($dbConfig);
 		/*
 		 * This will initialise the databases from config
 		 * and provide some code coverage for the connect() as well
 		 */ 
 		foreach($dbIds as $dbId)
 		{
-			DBManager::getDB($dbId);
+			$config->getDB($dbId);
 		}
 		
 		/*
 		 * Its difficult to test anything other than the mandatory config items.
-		 * We can't guarantee that bizySoftConfig will be our standard test file.
+		 * We can't guarantee that bizySoftConfig will be our standard test config.
 		 */
 		foreach ($dbIds as $dbId)
 		{
-			$this->assertTrue(array_key_exists(BizyStoreOptions::DB_ID_TAG, $config[$dbId]));
-			$this->assertTrue(array_key_exists(BizyStoreOptions::DB_NAME_TAG, $config[$dbId]));
-			$this->assertTrue(array_key_exists(BizyStoreOptions::DB_INTERFACE_TAG, $config[$dbId]));
+			$this->assertTrue(array_key_exists(self::DB_ID_TAG, $dbConfig[$dbId]));
+			$this->assertTrue(array_key_exists(self::DB_NAME_TAG, $dbConfig[$dbId]));
+			$this->assertTrue(array_key_exists(self::DB_INTERFACE_TAG, $dbConfig[$dbId]));
 		}
 	}
 	

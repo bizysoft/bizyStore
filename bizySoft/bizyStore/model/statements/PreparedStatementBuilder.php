@@ -1,8 +1,7 @@
 <?php
 namespace bizySoft\bizyStore\model\statements;
 
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
 
 /**
  * Provide some common functions for building prepared statements.
@@ -12,10 +11,12 @@ use bizySoft\bizyStore\services\core\BizyStoreConfig;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class PreparedStatementBuilder extends StatementBuilder
+class PreparedStatementBuilder extends StatementBuilder implements BizyStoreConstants
 {
+	private static $propertyPrefix = null;
+	
 	/**
 	 * Set up the db.
 	 *
@@ -23,36 +24,45 @@ class PreparedStatementBuilder extends StatementBuilder
 	 */
 	public function __construct($db)
 	{
+		if (self::$propertyPrefix === null)
+		{
+			/*
+			 * Determine if we need to supply a property prefix globally.
+			 */
+			$config = $db->getConfig();
+			
+			$bizyStore = $config->getProperty(self::BIZYSTORE_TAG);
+			$options = isset($bizyStore[self::OPTIONS_TAG]) ? $bizyStore[self::OPTIONS_TAG] : null;
+			$prefix = $options ? (isset($options[self::OPTION_PREPARE_PREFIX]) ? $options[self::OPTION_PREPARE_PREFIX] : false) : false;
+			
+			self::$propertyPrefix  = $prefix ? ":" : "";
+		}
 		parent::__construct($db);
 	}
 	
 	/**
-	 * Get the property prefix for this builder.
+	 * Get the property key prefix for this builder.
 	 *
-	 * PDO actually forces colon prefixes internally on property key's that don't have them, making it look
-	 * like the standard implementation which is particularly silly. At the moment PDO supports both colon 
-	 * and non-colon prefixed parameters. If PDO support ceases either way then a lot of other people's code
-	 * will not work. We provide some options to get around this, you can set the global option 'preparePrefix' in 
-	 * bizySoftConfig to true to invoke colon prefixing.
+	 * At the moment PDO supports both colon and non-colon prefixed parameter/property keys for replacement values. 
+	 * If this support ceases then a lot of other people's code will not work. We provide some options to get around 
+	 * this, you can set the global <bizyStore> <options> 'preparePrefix' in bizySoftConfig to true to invoke internal 
+	 * colon prefixing of parameter/property keys. The default is false.
 	 * 
 	 * From a PDO user point of view, our thoughts are that colon prefixes should be used only in the query as an 
-	 * indication that the following name is expected as a parameter/property, and NOT to force the replacement
-	 * parameters/properties to have a colon prefixed key.
+	 * indication that the following name is expected as a replacement parameter/property key, and NOT to force the 
+	 * replacement's key to have a colon prefix.
 	 * 
 	 * @return string
 	 */
 	public function getPropertyPrefix()
 	{
-		$prefix = BizyStoreConfig::getProperty(BizyStoreOptions::OPTION_PREPARE_PREFIX);
-
-		return $prefix ? ":" : "";
+		return self::$propertyPrefix;
 	}
 	
 	/**
-	 * Gets the function to translate a property into it's database query form.
+	 * Gets the function to translate a query property into it's database query form.
 	 * 
-	 * @return callable this function simply translates the property specified to a named parameter, handling
-	 * null values as 'IS NULL'.
+	 * @return callable this function simply translates the property specified to a named parameter.
 	 */
 	public function getPropertyTranslator()
 	{

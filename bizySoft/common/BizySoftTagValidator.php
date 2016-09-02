@@ -9,12 +9,12 @@ namespace bizySoft\common;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class BizySoftTagValidator extends TagValidator
 {
 	/**
-	 * Default constructor.
+	 * Default constructor. Nothing to validate under this tag.
 	 * 
 	 * Use setKeyValue($key, $value) to initialise with the data that will be validated.
 	 */
@@ -23,7 +23,7 @@ class BizySoftTagValidator extends TagValidator
 		/**
 		 * APP_NAME_TAG is the only mandatory field.
 		 */
-		$mandatory = array(AppOptions::APP_NAME_TAG);
+		$mandatory = array(AppConstants::APP_NAME_TAG);
 		parent::__construct($mandatory);
 	}
 }

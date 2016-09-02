@@ -12,7 +12,7 @@ use bizySoft\bizyStore\model\statements\Statement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class FuncSetFetchStrategy extends DBAccessStrategy
 {
@@ -33,7 +33,7 @@ class FuncSetFetchStrategy extends DBAccessStrategy
 	 * We use an array version of the row as the function parameter, so the signature of your function/method 
 	 * will always take a single array.
 	 *
-	 * @see \bizySoft\bizyStore\model\statements\DBAccessStrategyI::execute()
+	 * @return array
 	 */
 	public function execute($properties = array())
 	{

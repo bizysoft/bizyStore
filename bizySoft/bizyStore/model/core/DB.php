@@ -2,11 +2,9 @@
 namespace bizySoft\bizyStore\model\core;
 
 use bizySoft\bizyStore\model\statements\StatementBuilder;
-
 use bizySoft\bizyStore\model\statements\FindForUpdatePreparedStatement;
-use bizySoft\bizyStore\model\statements\CRUDPreparedStatementBuilder;
-use bizySoft\bizystore\services\core\BizyStoreOptions;
 use bizySoft\bizyStore\model\statements\PreparedPDOStatement;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Note that this class has no notion of what a database is. It's main use is to store general information from
@@ -17,7 +15,7 @@ use bizySoft\bizyStore\model\statements\PreparedPDOStatement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class DB implements DBI
 {
@@ -27,6 +25,13 @@ abstract class DB implements DBI
 	 * @var string
 	 */
 	private $dbId = null;
+	
+	/**
+	 * A reference to the application's config.
+	 *
+	 * @var Config
+	 */
+	private $config;
 	
 	/**
 	 * The name of the database from bizySoftConfig.
@@ -58,17 +63,19 @@ abstract class DB implements DBI
 	private $cachedStatements = array();
 
 	/**
-	 * Construct with database parameters from bizySoftConfig.
 	 *
 	 * Sets the class variables that are required for management of all DB instances.
 	 *
 	 * @param array $dbConfig an associative array containing the database config information supplied in bizySoftConfig.
 	 */
-	public function __construct(array $dbConfig)
+	public function __construct($dbId, Config $config)
 	{
-		$this->dbId = $dbConfig[BizyStoreOptions::DB_ID_TAG]; // Mandatory
-		$this->dbName = $dbConfig[BizyStoreOptions::DB_NAME_TAG]; // Mandatory
-		$this->schemaName = isset($dbConfig[BizyStoreOptions::DB_SCHEMA_TAG]) ? $dbConfig[BizyStoreOptions::DB_SCHEMA_TAG] : "";
+		$this->dbId = $dbId;
+		$this->config = $config;
+		$dbConfigs = $config->getProperty(self::DATABASE_TAG);
+		$dbConfig = $dbConfigs[$dbId];
+		$this->dbName = $dbConfig[self::DB_NAME_TAG]; // Mandatory
+		$this->schemaName = isset($dbConfig[self::DB_SCHEMA_TAG]) ? $dbConfig[self::DB_SCHEMA_TAG] : "";
 	}
 
 	/**
@@ -91,7 +98,19 @@ abstract class DB implements DBI
 		// Make sure we return an empty string not null
 		return $this->schemaName;
 	}
-
+	
+	/**
+	 * Sets the name of the schema that this DB instance is associated with.
+	 *
+	 * Some db's may need to set this to a default after base class construction.
+	 * 
+	 * @return string
+	 */
+	public function setSchemaName($name)
+	{
+		$this->schemaName = $name;
+	}
+	
 	/**
 	 * Gets the 'id' of this DB instance.
 	 *
@@ -102,6 +121,16 @@ abstract class DB implements DBI
 		return $this->dbId;
 	}
 
+	/**
+	 * Gets the application's config reference.
+	 * 
+	 * @return Config
+	 */
+	public function getConfig()
+	{
+		return $this->config;
+	}
+	
 	/**
 	 * Support for pessimistic locking if required.
 	 * 
@@ -141,10 +170,9 @@ abstract class DB implements DBI
 	 * @param StatementBuilder $statementBuilder optional StatementBuilder to build with.
 	 * @return string the select statement ready to prepare.
 	 */
-	public function buildSelectForUpdateStatement($tableName, array $properties, StatementBuilder $statementBuilder = null)
+	public function buildSelectForUpdateStatement($tableName, array $properties, StatementBuilder $statementBuilder)
 	{
-		$builder = $statementBuilder ? $statementBuilder : new CRUDPreparedStatementBuilder($this);
-		return $builder->buildModelSelectStatement($tableName, $properties) . " FOR UPDATE";
+		return $statementBuilder->buildModelSelectStatement($tableName, $properties) . " FOR UPDATE";
 	}
 
 	/**

@@ -43,13 +43,13 @@ The easiest way to start the ball rolling is to:
 
 You can look at the User Guide, example files and test cases to guide you in the right direction.
 
-Here is some code based on our examples that shows bizyStore's ease of use. It's a fully functional PHP file that can store Member details from an HTML form action into a database. 'Member' is a generated Model class which refers to a database table called 'member'. Boiler-plate code is not necessary, it's handled once during automatic Model/Schema generation.
+Here is some code based on our examples that shows bizyStore's ease of use. It's a fully functional PHP file that can store Member details from an HTML form post action into a database. 'Member' is a generated Model class which refers to a database table called 'member'. Boiler-plate code is not necessary, it's handled once during automatic Model/Schema generation. SQL injection issues are handled as a matter of course.
 
 ```php
 <?php
 include "bizySoft/bizyStore/services/core/bootstrap.php";
 
-use bizySoft\bizyStore\model\bizyStoreExample\Member;
+use bizySoft\bizyStore\app\bizyStoreExample\Member;
 
 $member = new Member($_POST);
 $member->create();

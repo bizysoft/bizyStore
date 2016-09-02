@@ -1,10 +1,9 @@
 <?php
 namespace bizySoft\tests;
 
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\Membership;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Membership;
 use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 
 /**
  * Test Models with foreign key declarations.
@@ -14,7 +13,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelForeignKeyTestCase extends ModelTestCase
 {
@@ -54,7 +53,8 @@ class ModelForeignKeyTestCase extends ModelTestCase
 			 */
 			$fkSchema = $jackMembership->getForeignKeySchema();
 			$dbId = $db->getDBId();
-			$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
+			$config = $db->getConfig();
+			$modelNamespace = $config->getModelNamespace();
 			$hasAdmin = false;
 			$hasMember = false;
 			/*
@@ -171,8 +171,8 @@ class ModelForeignKeyTestCase extends ModelTestCase
 				"length" => 1), $db);
 			$jackMembership->create();
 			
-			$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
-			
+			$config = $db->getConfig();
+			$modelNamespace = $config->getModelNamespace();
 			/*
 			 * Get any foreign key references from $jack's columns and use them to find the related Model objects.
 			 * In this Member instance just the "id" column has references.

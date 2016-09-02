@@ -1,6 +1,8 @@
 <?php
 namespace bizySoft\bizyStore\model\core;
 
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
+
 /**
  * Interface to specify database access methods that absolutely must be implemented to support CRUD or 
  * database management activities.
@@ -13,9 +15,9 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-interface DBI
+interface DBI extends BizyStoreConstants, SchemaConstants
 {
 	const COMMIT = "commit";
 	const ROLLBACK = "rollback";
@@ -28,12 +30,9 @@ interface DBI
 	public function getDateTime();
 	
 	/**
-	 * Gets a connection for this database.
-	 */
-	public function connect();
-	
-	/**
-	 * Closes the database connection
+	 * Closes the database connection with the mode.
+	 * 
+	 * @param string $mode one of DBI::COMMIT, DBI::ROLLBACK
 	 */
 	public function close($mode);
 	
@@ -99,7 +98,7 @@ interface DBI
 	/**
 	 * Is there a transaction active on the database.
 	 *
-	 * @return true if there is a transaction in progress, false otherwise.
+	 * @return boolean true if there is a transaction in progress, false otherwise.
 	 */
 	public function hasTransaction();
 	
@@ -115,6 +114,7 @@ interface DBI
 	 * 
 	 * @param callable $closure
 	 * @param string $isolationLevel the database isolation level of the transaction.
+	 * @return mixed
 	 */
 	public function transact($closure, $isolationLevel = null);
 	
@@ -176,6 +176,8 @@ interface DBI
 	
 	/**
 	 * Gets the table names from the database if none are specified in the bizySoftConfig file.
+	 * 
+	 * @return array
 	 */
 	public function getDBTableNames();
 	
@@ -183,6 +185,7 @@ interface DBI
 	 * Database specific method to get a sequence value.
 	 *
 	 * @param string $sequenceName
+	 * @return string
 	 */
 	public function getCurrentSequence($sequenceName);
 	

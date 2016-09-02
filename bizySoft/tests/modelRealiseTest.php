@@ -2,8 +2,8 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\Membership;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Membership;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -14,7 +14,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelRealiseTestCase extends ModelTestCase
 {
@@ -53,9 +53,9 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jack, keep the old one to compare
 			 */
 			$realiseJack = new Member($idProperty, $db);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jackArray = $realiseJack->realise(); // Realise just the parent level
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jackArray));
 			$jackRealised = reset($jackArray);			
 			$this->assertEquals($jack->getSchemaProperties(), $jackRealised->getSchemaProperties());
@@ -89,9 +89,9 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jack, keep the old one to compare
 			 */
 			$realiseJack = new Member($idProperty, $db);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jackArray = $realiseJack->realise(1); // Realise 1 hop from the parent
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jackArray));
 			$jackRealised = reset($jackArray);				
 			$this->assertEquals($jack->getSchemaProperties(), $jackRealised->getSchemaProperties());
@@ -133,9 +133,9 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jack, keep the old one to compare
 			 */
 			$realiseJack = new Member($idProperty, $db);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jackArray = $realiseJack->realise(2); // Realise 2 hops from the parent
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jackArray));
 			$jackRealised = reset($jackArray);
 	
@@ -199,9 +199,9 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jack membership, keep the old one to compare
 			 */
 			$realiseJackMembership = new Membership($idProperty, $db);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jackMembershipArray = $realiseJackMembership->realise(1); // Realise one hop from the membership
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jackMembershipArray));
 			$jackMembershipRealised = reset($jackMembershipArray); // First one
 			$this->assertEquals($jackMembership->getSchemaProperties(), $jackMembershipRealised->getSchemaProperties());
@@ -263,9 +263,9 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jill, keep the old one to compare
 			 */
 			$realiseJill = new Member($idProperty, $db);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jillArray = $realiseJill->realise(1); // Realise 1 hop from the parent
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jillArray));
 			$jillRealised = reset($jillArray);
 	
@@ -359,11 +359,11 @@ class ModelRealiseTestCase extends ModelTestCase
 			 * Realise a new jill, keep the old one to compare
 			 */
 			$realiseJill = new Member($idProperty, $db);
-			TestLogger::log("Index by key");
+			$this->logger->log("Index by key");
 			$indexOption = array(Model::OPTION_INDEX_KEY => true);
-			TestLogger::startTimer("realise");
+			$this->logger->startTimer("realise");
 			$jillArray = $realiseJill->realise(1, $indexOption); // Realise 1 hop from the parent
-			TestLogger::stopTimer("realise");
+			$this->logger->stopTimer("realise");
 			$this->assertEquals(1, count($jillArray));
 			foreach($jillArray as $key => $jillRealised)
 			{

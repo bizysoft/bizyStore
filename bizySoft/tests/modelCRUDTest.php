@@ -4,7 +4,6 @@ namespace bizySoft\tests;
 use bizySoft\bizyStore\model\core\Model;
 use bizySoft\bizyStore\model\statements\PreparedStatement;
 use bizySoft\bizyStore\model\statements\QueryPreparedStatement;
-use bizySoft\bizyStore\services\core\DBManager;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -15,7 +14,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelCRUDTestCase extends ModelTestCase
 {	
@@ -311,8 +310,11 @@ class ModelCRUDTestCase extends ModelTestCase
 	 */
 	public function testModelCopy()
 	{
-		$srcId = DBManager::getDefaultDBId();
-		$srcDB = DBManager::getDB($srcId);
+		$config = self::getTestcaseConfig();
+		$dbConfig = array_keys($config->getDbConfig());
+		$srcId = reset($dbConfig);
+		
+		$srcDB = $config->getDB($srcId);
 		
 		// Populate the default db
 		$this->populateBulkDB($srcDB);
@@ -332,12 +334,12 @@ class ModelCRUDTestCase extends ModelTestCase
 			 * $src is the first db defined in bizySoftConfig,
 			 * $destDB is all the other db's
 			 */
-			TestLogger::startTimer("query timer src");
+			$this->logger->startTimer("query timer src");
 			// All members from the src database
 			$allMembers = new $className(null, $srcDB);
 			// Get them all out
 			$allSrcMembers = $allMembers->find();
-			TestLogger::stopTimer("query timer src");
+			$this->logger->stopTimer("query timer src");
 			$this->assertEquals(ModelTestCase::ITERATIONS, count($allSrcMembers));
 			// Fix the date/time formatting between databases
 			$formData = $this->formData->getJackFormData();
@@ -346,7 +348,7 @@ class ModelCRUDTestCase extends ModelTestCase
 			// construct a model for the $destDB database
 			$memberCopy = new $className(null, $destDB);
 			
-			TestLogger::startTimer("copy timer");
+			$this->logger->startTimer("copy timer");
 			/*
 			 * Copy all the members to the $destDB database
 			 * 
@@ -360,10 +362,10 @@ class ModelCRUDTestCase extends ModelTestCase
 				));
 				$memberCopy->create();
 			}
-			TestLogger::stopTimer("copy timer");
+			$this->logger->stopTimer("copy timer");
 			
 			// Check the $destDB with FindPreparedStatement()
-			TestLogger::startTimer("query timer dest");
+			$this->logger->startTimer("query timer dest");
 			$allMembers = new $className(null, $destDB);
 			
 			$i = 0;
@@ -377,13 +379,13 @@ class ModelCRUDTestCase extends ModelTestCase
 				$diff = $this->formData->checkMemberDetails($destMember, $formData);
 				$this->assertTrue(empty($diff));
 			}
-			TestLogger::stopTimer("query timer dest");
+			$this->logger->stopTimer("query timer dest");
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i);
 			
 			// Check the $destDB using QueryPreparedStatement and object iterator
 			$tableName = $destDB->qualifyEntity($allMembers->getTableName());
 			$lastName = $destDB->formatEntity("lastName");
-			TestLogger::startTimer("query timer dest stdClass");
+			$this->logger->startTimer("query timer dest stdClass");
 			$options = array(
 					PreparedStatement::OPTION_CLASS_NAME => $className 
 			);
@@ -401,7 +403,7 @@ class ModelCRUDTestCase extends ModelTestCase
 				$diff = $this->formData->checkMemberDetails($destMember, $formData);
 				$this->assertTrue(empty($diff));
 			}
-			TestLogger::stopTimer("query timer dest stdClass");
+			$this->logger->stopTimer("query timer dest stdClass");
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i);
 		});
 	}

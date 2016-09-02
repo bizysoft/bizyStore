@@ -17,7 +17,7 @@ namespace bizySoft\bizyStore\model\statements;
  * undesirable behaviour differing with the PDO::ATTR_EMULATE_PREPARES setting. In any case, the behaviour is nowhere 
  * near consistent across drivers.
  * 
- * This class allows us to produce more relevant error messages than PDO can provide.
+ * This class allows us to produce more relevant error messages than it seems PDO can provide.
  * 
  */
 class PreparedPDOStatement

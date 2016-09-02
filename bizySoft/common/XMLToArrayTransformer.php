@@ -4,7 +4,6 @@ namespace bizySoft\common;
 use \DOMDocument;
 use \DOMNode;
 use \Exception;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 
 /**
  * Transform a well formed XML string to a PHP array.
@@ -22,7 +21,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class XMLToArrayTransformer implements GrinderI
 {
@@ -55,6 +54,7 @@ class XMLToArrayTransformer implements GrinderI
 	/**
 	 * Transforms the XML into an array.
 	 *
+	 * @return array
 	 * @throws Exception if XML/Tag validations fail.
 	 */
 	public function grind()
@@ -119,10 +119,10 @@ class XMLToArrayTransformer implements GrinderI
 		$bizySoftTag = $this->traverseXML($rootElement);
 		if (ValidationErrors::hasErrors())
 		{
-			throw new Exception(ValidationErrors::getErrorsAsString(), true);
+			throw new Exception(ValidationErrors::getErrorsAsString());
 		}
 		/*
-		 * Return only the contents of the bizySoft tag.
+		 * Return only the 'contents' of the bizySoft tag.
 		 */
 		return $bizySoftTag->getValue();
 	}
@@ -139,7 +139,7 @@ class XMLToArrayTransformer implements GrinderI
 		/* 
 		 * Set up the Tag we will use to process
 		 */
-		$thisClass = isset($this->tagClasses[$nodeName]) ? $this->tagClasses[$nodeName] : "bizySoft\common\ParentTag";
+		$thisClass = isset($this->tagClasses[$nodeName]) ? $this->tagClasses[$nodeName] : 'bizySoft\common\ParentTag';
 		$thisTag = new $thisClass($nodeName);
 		/*
 		 * Process the Tag with it's children.
@@ -169,7 +169,7 @@ class XMLToArrayTransformer implements GrinderI
 					 */
 					$childName = trim($child->nodeName);
 					$childValue = trim($child->nodeValue);
-					$childClass = isset($this->tagClasses[$childName]) ? $this->tagClasses[$childName] : "bizySoft\common\ChildTag";
+					$childClass = isset($this->tagClasses[$childName]) ? $this->tagClasses[$childName] : 'bizySoft\common\ChildTag';
 					
 					$childTag = new $childClass($childName, $childValue);
 					$thisTag->add($childTag);
@@ -185,7 +185,7 @@ class XMLToArrayTransformer implements GrinderI
 	 * Determine if the parent node has node children.
 	 * 
 	 * @param DOMNode $parent
-	 * @return bool true if the parent node has children of type XML_ELEMENT_NODE, false otherwise.
+	 * @return boolean true if the parent node has children of type XML_ELEMENT_NODE, false otherwise.
 	 */
 	private function hasChild($parent)
 	{

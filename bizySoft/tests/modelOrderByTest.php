@@ -2,7 +2,7 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\model\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Member;
 
 /**
  * Test Model order by, limit and offset.
@@ -12,7 +12,7 @@ use bizySoft\bizyStore\model\unitTest\Member;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelOrderByTestCase extends ModelTestCase
 {

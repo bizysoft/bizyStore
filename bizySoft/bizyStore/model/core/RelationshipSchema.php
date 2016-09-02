@@ -1,9 +1,6 @@
 <?php
 namespace bizySoft\bizyStore\model\core;
 
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-
 /**
  * RelationshipSchema provides a means of realising relationships from a Model.
  *
@@ -12,7 +9,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class RelationshipSchema extends Schema
 {
@@ -27,7 +24,7 @@ abstract class RelationshipSchema extends Schema
 	}
 
 	/**
-	 * Sets the relationship into the Model's properties under the BizyStoreOptions::DB_RELATIONSHIPS_TAG key.
+	 * Sets the relationship into the Model's properties.
 	 * 
 	 * The property name for a particular relationship is the table name of the declared foreign key and the 
 	 * columns of the declared foreign key all concatenated with a '.'. This is true when navigating from either 
@@ -164,10 +161,12 @@ abstract class RelationshipSchema extends Schema
 				 */
 				if (!$this->isRedundant($currentRel, $relName))
 				{
-					$modelNamespace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
+					$db = $model->getDB();
+					$config = $db->getConfig();
+					$modelNamespace = $config->getModelNamespace();
 					$foreignClass = "$modelNamespace\\" . ucfirst($foreignTable);
 						
-					$nextModel = new $foreignClass($foreignProperties, $model->getDB());
+					$nextModel = new $foreignClass($foreignProperties, $db);
 					$result = $nextModel->find($options);
 					
 					if ($result)

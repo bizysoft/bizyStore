@@ -11,7 +11,7 @@ namespace bizySoft\tests;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  * @codeCoverageIgnore
  */
 use bizySoft\tests\services\TestLogger;

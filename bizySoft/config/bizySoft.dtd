@@ -1,10 +1,12 @@
 
-  <!ELEMENT bizySoft            (appName, bizyStore?, options?)>
+  <!ELEMENT bizySoft            (appName, bizyStore?, rest?, options?)>
   <!ELEMENT appName             (#PCDATA)>
   <!ELEMENT bizyStore           (database+, options?)>
   <!ELEMENT options             (#PCDATA)>
   <!ELEMENT database            (id, interface, host?, port?, socket?, name, schema?, user?, password?, charset?, tables?, relationships?, pdoOptions?, pdoPrepareOptions?, modelPrepareOptions?)>
   <!ELEMENT relationships       (foreignKeys?, recursive?)>
+  <!ELEMENT rest                (services?, options?)>
+  <!ELEMENT services            (#PCDATA)>
   <!ELEMENT id                  (#PCDATA)>
   <!ELEMENT interface           (#PCDATA)>
   <!ELEMENT host                (#PCDATA)>

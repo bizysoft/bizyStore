@@ -1,8 +1,6 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\SchemaI;
-
 /**
  * Store foreign key information about a table based on a database id. 
  * 
@@ -14,7 +12,7 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ForeignProperties extends SchemaProperties
 {
@@ -33,13 +31,13 @@ class ForeignProperties extends SchemaProperties
 		{
 			foreach($columnSchema as $columnProperties)
 			{
-				$columnName = $columnProperties[SchemaI::COLUMN_NAME];
+				$columnName = $columnProperties[self::COLUMN_NAME];
 				/*
 				 * Some databases use a true index name others just a numeric index.
 				 */
-				$indexName = $columnProperties[SchemaI::KEY_NAME];
-				$referencedTable = $columnProperties[SchemaI::REFERENCED_TABLE];
-				$referencedColumn = $columnProperties[SchemaI::REFERENCED_COLUMN];
+				$indexName = $columnProperties[self::KEY_NAME];
+				$referencedTable = $columnProperties[self::REFERENCED_TABLE];
+				$referencedColumn = $columnProperties[self::REFERENCED_COLUMN];
 				
 				if(!isset($foreignKeyProperties[$dbId]))
 				{

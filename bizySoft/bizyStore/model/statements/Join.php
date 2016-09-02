@@ -3,10 +3,9 @@ namespace bizySoft\bizyStore\model\statements;
 
 use \PDO;
 use \PDOStatement;
-use bizySoft\bizyStore\model\core\DB;
-use bizySoft\bizyStore\model\core\ModelOptions;
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
+use bizySoft\bizyStore\model\core\PDODB;
+use bizySoft\bizyStore\model\core\ModelConstants;
+
 /**
  * Provide support for Model Join operations.
  * 
@@ -20,7 +19,7 @@ use bizySoft\bizyStore\services\core\BizyStoreOptions;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class Join
 {
@@ -99,23 +98,23 @@ class Join
 	 * 
 	 * @param DB $db database to work on.
 	 * @param string $resolvePath definition of the database relationship path to resolve.
-	 * @param array $builder properties for the where clause based on the first JoinSpec.
 	 * @param array $options can be the normal prepare options, additionally it can contain self::OPTION_SWIZZLE a boolean 
 	 * value to turn on/off. The default is true. self::OPTION_JOIN_TYPES specifying the join types between each JoinSpec.
 	 * @see JoinSpec for more info.
 	 */
-	public function __construct(DB $db, $resolvePath, array $options = array())
+	public function __construct(PDODB $db, $resolvePath, array $options = array())
 	{
 		$this->db = $db;
 		$this->swizzle = isset($options[self::OPTION_SWIZZLE]) ? $options[self::OPTION_SWIZZLE] : true;
-		$this->indexByKey = isset($options[ModelOptions::OPTION_INDEX_KEY]) ? $options[ModelOptions::OPTION_INDEX_KEY] : false;
+		$this->indexByKey = isset($options[ModelConstants::OPTION_INDEX_KEY]) ? $options[ModelConstants::OPTION_INDEX_KEY] : false;
 		/*
 		 * Get the join types for the JoinSpecs (if any) this should be an (N-1) array where N is the number of JoinSpecs.
 		 */
 		$this->joinOptions = isset($options[self::OPTION_JOIN_TYPES]) ? $options[self::OPTION_JOIN_TYPES] : array();
 		
 		$joinSpecs = explode("=>", $resolvePath);
-		$modelNameSpace = BizyStoreConfig::getProperty(BizyStoreOptions::BIZYSTORE_MODEL_NAMESPACE);
+		$config = $db->getConfig();
+		$modelNameSpace = $config->getModelNamespace();
 		foreach ($joinSpecs as $i => $joinSpec)
 		{
 			/*
@@ -189,9 +188,6 @@ class Join
 	 * are returned in declared order.
 	 * 
 	 *          Author->AuthorBook->Book
-	 *          
-	 * No matter how long the resolve path is, this method will perform a single database query. 
-	 * Only the resolve path relationships are resolved.
 	 *  
 	 * @return array 
 	 */
@@ -328,7 +324,7 @@ class Join
 		{
 			$columnSchema = array_keys($joinSpec->columnSchema->get($dbId));
 			/*
-			 * This is the conversion
+			 * This is the conversion for each table includein the join.
 			 */
 			$length = count($columnSchema);
 			$result[] = array_combine($columnSchema, array_slice($row, $start, $length));

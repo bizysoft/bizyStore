@@ -9,9 +9,9 @@ namespace bizySoft\bizyStore\model\statements;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-interface StatementI extends StatementOptions
+interface StatementI extends StatementConstants
 {
 	/**
 	 * Free up the statement resources.
@@ -55,11 +55,15 @@ interface StatementI extends StatementOptions
 	
 	/**
 	 * Gets the database reference
+	 * 
+	 * @return DB
 	 */
 	public function getDB();
 	
 	/**
 	 * Gets the PDOStatement 
+	 * 
+	 * @return PDOStatement
 	 */
 	public function getStatement();
 	
@@ -114,7 +118,7 @@ interface StatementI extends StatementOptions
 	public function assocRow();
 	
 	/**
-	 * Get the next statement row as an object array with instances specified by the OPTION_CLASS_NAME option
+	 * Get the next statement row as an object instance specified by the OPTION_CLASS_NAME option
 	 * or stdClass if not specified.
 	 *
 	 * The statement must have been executed before this method can be called.

@@ -14,7 +14,7 @@ use bizySoft\bizyStore\model\core\PDODB;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class DBExecuteStrategy extends DBAccessStrategy
 {
@@ -34,7 +34,7 @@ class DBExecuteStrategy extends DBAccessStrategy
 	 *
 	 * @return int the no of rows affected.
 	 * @throws ModelException
-	 * @see \bizySoft\bizyStore\model\statements\DBAccessStrategyI::execute()
+	 * @return integer
 	 */
 	public function execute($properties = array())
 	{

@@ -28,12 +28,17 @@
 			<name>/path/to/bizySoft/examples/db/bizy.db</name><!-- Change this to suit the path to the bizySoft directory -->
 			<relationships>
 				<foreignKeys>
-				<!-- 
-					The unit tests rely on this entry.
-					The uniqueKeyMembership table in this database is purposely not configured with foreign keys, but foreign key 
-					relationships can be realised by bizyStore with this config declaration.
-				-->
+					<!-- 
+						The unit tests rely on these entries for the SQLite database.
+						
+						The uniqueKeyMembership table in this database is purposely not configured with foreign keys, but foreign key 
+						relationships can be realised by bizyStore with this config declaration.
+						
+						Same for the membershipView view which is specific to this database.
+					-->
 					uniqueKeyMembership(memberFirstName.memberLastName.memberDob) => uniqueKeyMember(firstName.lastName.dob);
+					membershipView(memberId) => memberView(id);
+					membershipView(adminId) => memberView(id)
 				</foreignKeys>
 			</relationships>
 			<pdoOptions>
@@ -69,4 +74,8 @@
 		</database>
 	-->
 	</bizyStore>
+    <options>
+        logger => bizySoft\tests\services\TestLogger;
+        logFile => /var/www/bizySoft/tests/unitTest.log;
+    </options>
 </bizySoft>

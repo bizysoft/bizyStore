@@ -11,7 +11,7 @@ use bizySoft\bizyStore\model\statements\UpdatePreparedStatement;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class OptimisticUpdate extends OptimisticWrite
 {
@@ -60,7 +60,8 @@ class OptimisticUpdate extends OptimisticWrite
 				 * Now setup the properties we need to update. We want the $newProperties in a union with the 
 				 * dirtied (new) Model properties.
 				 * 
-				 * Note that the $newProperties takes precedence, so will overwrite dirtied Model properties if they are the same.
+				 * Note that the $newProperties takes precedence, so will overwrite dirtied Model properties 
+				 * if they have the same key.
 				 */
 				$newProperties += array_intersect_key($modelProperties, $dirty);
 			}
@@ -98,7 +99,7 @@ class OptimisticUpdate extends OptimisticWrite
 	/**
 	 * Do any clean up to finalise the write to the database.
 	 * 
-	 * Set the new properties into the original Model if it was a unique update.
+	 * Set the new properties into the original Model.
 	 */
 	protected function cleanUp()
 	{

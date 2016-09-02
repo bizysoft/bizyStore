@@ -1,7 +1,7 @@
 <?php
 use \Exception;
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\model\bizyStoreExample\Member;
+use bizySoft\bizyStore\app\bizyStoreExample\Member;
 
 /**
  * memberCreate.php
@@ -10,13 +10,15 @@ use bizySoft\bizyStore\model\bizyStoreExample\Member;
  * 
  * http://yourserver/examples/memberEntry.html
  *
- * This is an entry/top level php file called by a form action. It shows an example of creating a 'Member'
- * in a database from a web form. It includes data storage/retrieval, transactions, exception handling, 
- * international charsets, timing and building a real html page. This code is compatible with all our supported 
+ * This is an entry/top level php file called by a form action. You should realise that this is just an example, so does not comply
+ * with best practices of producing a web page via PHP.
+ * 
+ * It shows an example of creating a 'Member' in a database from a web form. It includes data storage/retrieval, transactions, 
+ * exception handling, international charsets, timing and building a real html page. This code is compatible with all our supported 
  * database vendors.
  *
  * You can use the bizySoftConfig file (bizySoft/config/bizyStoreExample.xml) as a basis which
- * is provided in the distribution. You will possibly need to change the path to the database in this file to suit
+ * is provided in the distribution. You will need to change the path to the database in this file to suit
  * your environment, then copy the file to the default bizySoftConfig file (bizySoft/config/bizySoftConfig.xml).
  * This references the SQLite database (also provided) which is the default unit test database.
  *
@@ -29,14 +31,14 @@ use bizySoft\bizyStore\model\bizyStoreExample\Member;
  * This eliminates problems with namespaces, use statements and include calls etc...
  * 
  * It's recommended practice for the bizySoft directory to be OUTSIDE the web server's DOCUMENT_ROOT. You must still give your 
- * web server write access to the bizySoft directories for Schema file generation or logging if required.
+ * web server write access to the bizySoft directories for Schema file generation or logging.
  * 
  * <span style="color:orange">If you find our software helpful, the best way to contribute
  * is to hire us to work for you. </span> Details at <a href="http://www.bizysoft.com.au">http://www.bizysoft.com.au</a>
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 
 /*
@@ -50,7 +52,7 @@ include str_replace("/", DIRECTORY_SEPARATOR, "bizySoft/bizyStore/services/core/
 echo "<!DOCTYPE html>";
 echo "<html>";
 echo "<head>";
-echo "<meta charset='utf-8'>";
+echo "<meta charset=\"utf-8\">";
 echo "</head>";
 echo "<body>";
 
@@ -71,16 +73,16 @@ try
 	 * Model constructors can throw a ModelException if the config file becomes out of sync with the generated 
 	 * classes, so we also put this in the try block.
 	 * 
-	 * You would normally need to validate the $_POST form data before storing in the db, this is just an 
-	 * example so we don't.
+	 * bizyStore automatically handles SQL injection issues via prepared statements. If your application requires, 
+	 * you should validate the $_POST form data before storing in the db, this is just an example so no validations.
 	 * 
 	 * The Model references the default database for a Member object because we haven't specified one expicitly. 
 	 * The default database for a Model is the first database specified in bizySoftConfig that has the particular
 	 * Model as a table.
 	 * 
-	 * Model class files will be generated in the bizySoft/bizyStore/model/bizyStoreExample directory. Model generation 
-	 * is automatic via the auto-loader when the SPL needs the definition of "Member", as referenced in the 'use' statement 
-	 * above.
+	 * Model class files will be generated in the bizySoft/bizyStore/app/<appName> directory, where <appName> is from 
+	 * bizySoftConfig. Model generation is automatic via the auto-loader when the SPL needs 
+	 * the definition of "Member", as referenced in the 'use' statement above.
 	 */
 	$member = new Member($_POST);
 	$db = $member->getDB();

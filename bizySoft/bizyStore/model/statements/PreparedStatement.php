@@ -2,8 +2,7 @@
 namespace bizySoft\bizyStore\model\statements;
 
 use bizySoft\bizyStore\model\strategies\PreparedStatementExecuteStrategy;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\DBManager;
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
 
 /**
  * Abstract class for prepared statements.
@@ -32,21 +31,14 @@ use bizySoft\bizyStore\services\core\DBManager;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class PreparedStatement extends Statement
+abstract class PreparedStatement extends Statement implements BizyStoreConstants
 {
 	/**
 	 * The key to store the PreparedStatement under.
 	 */
 	const OPTION_PREPARE_KEY = "prepareKey";
-	
-	/**
-	 * Option key to cache the statement.
-	 * 
-	 * @var string
-	 */
-	const OPTION_CACHE = BizyStoreOptions::OPTION_CACHE;
 	
 	/**
 	 * The associative array of properties to replace the colon prefixed named keys in the statement.
@@ -106,16 +98,21 @@ abstract class PreparedStatement extends Statement
 	public function __construct($db, $options = array())
 	{
 		/*
-		 * Pass through the options to the parent.
+		 * Get the db options
 		 */
-		parent::__construct($db, $options);
+		$config = $db->getConfig();
+		$dbConfig = $config->getDBConfig($db->getDBId());
 		/*
 		 * Set the options for the PreparedStatement in the correct order.
 		 * 
 		 * We set the prepare options from config only once per instance as prepare() is called from here...
 		 */
-		$this->setPrepareOptions($options);
+		$this->setPrepareOptions($options, $dbConfig);
 		$this->setUserOptions($options);
+		/*
+		 * Pass through the options to the parent.
+		 */
+		parent::__construct($db, $options);
 		/*
 		 * Do whatever we need to do before setting the statement in stone.
 		 */
@@ -178,9 +175,6 @@ abstract class PreparedStatement extends Statement
 	 * 
 	 * Execution options such as OPTION_FUNCTION/OPTION_CLASS_NAME/OPTION_CACHE etc. can be set externally through 
 	 * setOptions() to allow different behaviour on a cached statement if the need arises.
-	 * 
-	 * Take care when using this method because it destroys the previous options in the instance and may
-	 * have an effect on the statement if it is already prepared.
 	 *
 	 * @param array $options
 	 * @return array The previous options that were specified.
@@ -210,22 +204,21 @@ abstract class PreparedStatement extends Statement
 	 */
 	private function setUserOptions($options)
 	{
-		if (isset($options[BizyStoreOptions::OPTION_CACHE]))
+		if (isset($options[self::OPTION_CACHE]))
 		{
-			$this->prepareOptions[BizyStoreOptions::OPTION_CACHE] = $options[BizyStoreOptions::OPTION_CACHE];
+			$this->prepareOptions[self::OPTION_CACHE] = $options[self::OPTION_CACHE];
 		}
 		if (isset($options[self::OPTION_PREPARE_KEY]))
 		{
 			$this->prepareOptions[self::OPTION_PREPARE_KEY] = $options[self::OPTION_PREPARE_KEY];
 			/*
 			 * Set the key if it has been specified. It must be unique for a $db instance.
-			*/
-			$this->key = $options[self::OPTION_PREPARE_KEY];;
-			/*
+			 */
+			$this->key = $options[self::OPTION_PREPARE_KEY];
 			/*
 			 * Turn the cache on explicitly.
 			 */
-			$this->prepareOptions[BizyStoreOptions::OPTION_CACHE] = true;
+			$this->prepareOptions[self::OPTION_CACHE] = true;
 		}
 	}
 	
@@ -239,17 +232,15 @@ abstract class PreparedStatement extends Statement
 	 *
 	 * @param array $options
 	 */
-	private function setPrepareOptions($options)
+	protected function setPrepareOptions(array &$options, array $dbConfig)
 	{
-		$dbConfig = DBManager::getDBConfig($this->getDB()->getDBId());
-			
 		/*
 		 * These are general options applied to all prepared statements for this DB.
 		 */
-		$configPDOPrepareOptions = isset($dbConfig[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] : array();
+		$configPDOPrepareOptions = isset($dbConfig[self::PDO_PREPARE_OPTIONS_TAG]) ? $dbConfig[self::PDO_PREPARE_OPTIONS_TAG] : array();
 		if(!empty($configPDOPrepareOptions))
 		{
-			$this->prepareOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] = $configPDOPrepareOptions;
+			$this->prepareOptions[self::PDO_PREPARE_OPTIONS_TAG] = $configPDOPrepareOptions;
 		}
 		/*
 		 * Override config prepare options with user options if any.
@@ -258,12 +249,12 @@ abstract class PreparedStatement extends Statement
 		 * eg.
 		 * PDO_PREPARE_OPTIONS_TAG => array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL, etc...)
 		 */
-		$userPDOPrepareOptions = isset($options[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG]) ? $options[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] : array();
+		$userPDOPrepareOptions = isset($options[self::PDO_PREPARE_OPTIONS_TAG]) ? $options[self::PDO_PREPARE_OPTIONS_TAG] : array();
 		if ($userPDOPrepareOptions)
 		{
-			if ($prepareOptions = $this->prepareOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG])
+			if ($prepareOptions = $this->prepareOptions[self::PDO_PREPARE_OPTIONS_TAG])
 			{
-				$this->prepareOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] = array_replace($prepareOptions, $userPDOPrepareOptions);
+				$this->prepareOptions[self::PDO_PREPARE_OPTIONS_TAG] = array_replace($prepareOptions, $userPDOPrepareOptions);
 			}
 		}
 	}
@@ -310,8 +301,8 @@ abstract class PreparedStatement extends Statement
 	 */
 	public function getPDOPrepareOptions()
 	{
-		return isset($this->prepareOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG]) ? 
-			$this->prepareOptions[BizyStoreOptions::PDO_PREPARE_OPTIONS_TAG] : array();
+		return isset($this->prepareOptions[self::PDO_PREPARE_OPTIONS_TAG]) ? 
+			$this->prepareOptions[self::PDO_PREPARE_OPTIONS_TAG] : array();
 	}
 	
 	/**
@@ -337,6 +328,7 @@ abstract class PreparedStatement extends Statement
 	 * 
 	 * Constructing a PreparedStatement without turning the cache on will prepare the statement per instance.
 	 *
+	 * @return PDOStatement
 	 * @throws ModelException if the statement cannot be prepared.
 	 */
 	public function prepare()
@@ -345,8 +337,8 @@ abstract class PreparedStatement extends Statement
 		 * The cache is always on if we have a key set.
 		 */
 		$key = $this->key;
-		$cache = $key || (isset($this->prepareOptions[BizyStoreOptions::OPTION_CACHE]) && 
-							$this->prepareOptions[BizyStoreOptions::OPTION_CACHE] == true);
+		$cache = $key || (isset($this->prepareOptions[self::OPTION_CACHE]) && 
+							$this->prepareOptions[self::OPTION_CACHE] == true);
 		
 		$preparedPDOStatement = null;
 		$statement = null;
@@ -397,6 +389,8 @@ abstract class PreparedStatement extends Statement
 
 	/**
 	 * Builds the statement and indicates that it does not need finalisation.
+	 * 
+	 * @return string
 	 */
 	private function getBuildStatement()
 	{

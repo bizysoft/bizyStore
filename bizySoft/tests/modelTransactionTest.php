@@ -4,8 +4,7 @@ namespace bizySoft\tests;
 use bizySoft\bizyStore\model\core\PDODB;
 use bizySoft\bizyStore\model\core\DBTransaction;
 use bizySoft\bizyStore\model\core\ModelException;
-use bizySoft\bizyStore\services\core\DBManager;
-use bizySoft\bizyStore\model\unitTest\UniqueKeyMember;
+use bizySoft\bizyStore\app\unitTest\UniqueKeyMember;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -23,7 +22,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelTransactionTestCase extends ModelTestCase
 {
@@ -114,10 +113,12 @@ class ModelTransactionTestCase extends ModelTestCase
 		$classNames = self::getTestClasses();
 		$testCase = $this;
 		
+		$config = self::getTestcaseConfig();
+		
 		// Do for all db's
-		foreach (DBManager::getDBIds() as $dbId)
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
-			$db = DBManager::getDB($dbId);
+			$db = $config->getDB($dbId);
 			
 			$db->transact(function ($db, $outerTxn) use ($testCase, $classNames)
 			{
@@ -218,7 +219,7 @@ class ModelTransactionTestCase extends ModelTestCase
 			catch ( ModelException $nestedEx )
 			{
 				$message = "Test Exception: inner = " . $nestedEx->getMessage();
-				TestLogger::log($message);
+				$this->logger->log($message);
 				if ($innerTxn)
 				{
 					$innerTxn->rollBack();
@@ -283,9 +284,11 @@ class ModelTransactionTestCase extends ModelTestCase
 	public function testForceDuplicateKeyTransact()
 	{
 		$formData = $this->formData->getJackFormData();
-		foreach (DBManager::getDBIds() as $dbId)
+		$config = self::getTestcaseConfig();
+		
+		foreach ($config->getDBConfig() as $dbId => $dbConfig)
 		{
-			$db = DBManager::getDB($dbId);
+			$db = $config->getDB($dbId);
 			try
 			{
 				$db->transact(function ($db, $txn) use ($formData) 

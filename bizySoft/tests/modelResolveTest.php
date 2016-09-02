@@ -5,8 +5,8 @@ use bizySoft\bizyStore\model\core\Model;
 use bizySoft\bizyStore\model\statements\Join;
 use bizySoft\bizyStore\model\statements\JoinPreparedStatement;
 use bizySoft\bizyStore\model\statements\JoinStatement;
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\Membership;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Membership;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -17,7 +17,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelResolveTestCase extends ModelTestCase
 {
@@ -41,12 +41,12 @@ class ModelResolveTestCase extends ModelTestCase
 			$jill = new Member(array("firstName" => "Jill"), $db);
 			$jill = $jill->findUnique();
 														
-			TestLogger::startTimer("jackJill.join.membership");
+			$this->logger->startTimer("jackJill.join.membership");
 			$options = array(Model::OPTION_APPEND_CLAUSE => "<EfirstNameE> IN (<PjackP>, <PjillP>)");
 			$properties = array("jack" => "Jack", "jill" => "Jill");
 			$join = new JoinPreparedStatement($db, "member(id) => membership(memberId)", $properties, $options);
 			$models = $join->objectSet();
-			TestLogger::stopTimer("jackJill.join.membership");
+			$this->logger->stopTimer("jackJill.join.membership");
 			$jackTested = false;
 			$jillTested = false;
 			foreach ($models as $model)
@@ -101,12 +101,12 @@ class ModelResolveTestCase extends ModelTestCase
 				
 			$dateCreated = $db->getConstantDateTime();
 				
-			TestLogger::startTimer("jackJill.join.membership");
+			$this->logger->startTimer("jackJill.join.membership");
 			$options = array(Model::OPTION_APPEND_CLAUSE => "<EfirstNameE> IN (<PjackP>, <PjillP>)");
 			$properties = array("jack" => "Jack", "jill" => "Jill");
 			$join = new JoinStatement($db, "member(id) => membership(memberId)", $properties, $options);
 			$models = $join->objectSet();
-			TestLogger::stopTimer("jackJill.join.membership");
+			$this->logger->stopTimer("jackJill.join.membership");
 			$jackTested = false;
 			$jillTested = false;
 			foreach ($models as $model)
@@ -154,11 +154,11 @@ class ModelResolveTestCase extends ModelTestCase
 			$jack = new Member(array("firstName" => "Jack"), $db);
 			$jack = $jack->findUnique();
 				
-			TestLogger::startTimer("jack.join.membership");
+			$this->logger->startTimer("jack.join.membership");
 			$jackProperties = array("firstName" => "Jack");
 			$statement = $jack->getJoinStatement("member(id) => membership(memberId)", $jackProperties);
 			$models = $statement->objectSet();
-			TestLogger::stopTimer("jack.join.membership");
+			$this->logger->stopTimer("jack.join.membership");
 			$jackTested = false;
 			foreach ($models as $model)
 			{
@@ -201,11 +201,11 @@ class ModelResolveTestCase extends ModelTestCase
 			 */
 			$jacksIdProperty = $jack->get(array("id" => null));
 			$resolveJack = new Member($jacksIdProperty, $db);
-			TestLogger::startTimer("jack.resolve.many-to-many");
+			$this->logger->startTimer("jack.resolve.many-to-many");
 			$models = $resolveJack->resolve("member(id) => membership(memberId, adminId) => member(id)", array(Model::OPTION_INDEX_KEY => true));
-			TestLogger::stopTimer("jack.resolve.many-to-many");
+			$this->logger->stopTimer("jack.resolve.many-to-many");
 			$resolvedJack = reset($models);
-			//TestLogger::log("jack = " . $this->sprintModel($resolvedJack));
+			//$this->logger->log("jack = " . $this->sprintModel($resolvedJack));
 			$this->assertEquals($jack->getSchemaProperties(), $resolvedJack->getSchemaProperties());
 			
 			$properties = $resolvedJack->get();
@@ -279,16 +279,16 @@ class ModelResolveTestCase extends ModelTestCase
 			
 			$dateCreated = $db->getConstantDateTime();
 											
-			TestLogger::startTimer("jack.resolve.many-to-many.noswizzle");
+			$this->logger->startTimer("jack.resolve.many-to-many.noswizzle");
 			$models = $jack->resolve("member(id) => membership(memberId, adminId) => member(id)", 
 					array(Join::OPTION_SWIZZLE => false));
-			TestLogger::stopTimer("jack.resolve.many-to-many.noswizzle");
+			$this->logger->stopTimer("jack.resolve.many-to-many.noswizzle");
 			/*
 			 * We resolved from Jack, so only one result.
 			 */
 			$this->assertEquals(1, count($models));
 			$resolvedJack = reset($models);
-			//TestLogger::log("jack = " . $this->sprintModel($resolvedJack));
+			//$this->logger->log("jack = " . $this->sprintModel($resolvedJack));
 			$this->assertEquals($jack->getSchemaProperties(), $resolvedJack->getSchemaProperties());
 			$properties = $resolvedJack->get();
 			/*
@@ -356,19 +356,19 @@ class ModelResolveTestCase extends ModelTestCase
 			
 			$dateCreated = $db->getConstantDateTime();
 											
-			TestLogger::startTimer("jack.resolve.many-to-many.more");
+			$this->logger->startTimer("jack.resolve.many-to-many.more");
 			/*
 			 * Many-to-many back out to the membership of the admin member. 
 			 */
 			$models = $jack->resolve("member(id) => membership(memberId, adminId) => member(id) => membership(memberId)", 
 					array(Model::OPTION_INDEX_KEY => true));
-			//TestLogger::stopTimer("jack.resolve.many-to-many.more");
+			//$this->logger->stopTimer("jack.resolve.many-to-many.more");
 			/*
 			 * We resolved from Jack, so only one result.
 			 */
 			$this->assertEquals(1, count($models));
 			$resolvedJack = reset($models);
-			TestLogger::log("jack = " . $this->sprintModel($resolvedJack));
+			//$this->logger->log("jack = " . $this->sprintModel($resolvedJack));
 			$this->assertEquals($jack->getSchemaProperties(), $resolvedJack->getSchemaProperties());
 			$properties = $resolvedJack->get();
 			/*
@@ -471,9 +471,9 @@ class ModelResolveTestCase extends ModelTestCase
 			 */
 			$jacksIdProperty = $jack->get(array("id" => null));
 			$resolveJack = new Member($jacksIdProperty, $db);
-			TestLogger::startTimer("jack.resolve.himself");
+			$this->logger->startTimer("jack.resolve.himself");
 			$models = $resolveJack->resolve("member(id) => membership(memberId, memberId) => member(id)", array(Model::OPTION_INDEX_KEY => true));
-			TestLogger::stopTimer("jack.resolve.himself");
+			$this->logger->stopTimer("jack.resolve.himself");
 			$resolvedJack = reset($models);
 			$this->assertEquals($jack->getSchemaProperties(), $resolvedJack->getSchemaProperties());
 				

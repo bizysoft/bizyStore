@@ -9,7 +9,7 @@ namespace bizySoft\common;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ArrayOptionHandler implements OptionHandlerI
 {
@@ -54,7 +54,7 @@ class ArrayOptionHandler implements OptionHandlerI
 	}
 
 	/**
-	 * Allow seting of the option.
+	 * Allow setting of the option.
 	 *
 	 * Use this if you require further searches within a returned option.
 	 *

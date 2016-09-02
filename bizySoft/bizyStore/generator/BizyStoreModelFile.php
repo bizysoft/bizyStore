@@ -1,12 +1,12 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
+use bizySoft\bizyStore\services\core\Config;
 
 /**
  * Concrete class defining methods that are used for generating the Model class files via the ModelGenerator. 
  * 
- * Generated classes represent a database table and provide a mechanism for CRUD functionality. This class forms part 
+ * Generated classes that represent a database table providing a mechanism for CRUD functionality. This class forms part 
  * of the code generation framework and is only referenced by the ModelGenerator.
  *
  * Produces class files that are PSR-4 compliant wrt the bizyStore installation.
@@ -16,7 +16,7 @@ use bizySoft\bizyStore\services\core\BizyStoreConfig;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class BizyStoreModelFile extends ClassFile
 {
@@ -25,11 +25,13 @@ class BizyStoreModelFile extends ClassFile
 	 *
 	 * @param string $className
 	 * @param string $dbId
+	 * @param array $config The application's config 
 	 */
-	public function __construct($className, $dbId)
+	public function __construct($className, $dbId, Config $config = null)
 	{
 		$this->className = $className;
 		$this->dbId = $dbId;
+		parent::__construct($config);
 	}
 	
 	/**
@@ -42,13 +44,12 @@ class BizyStoreModelFile extends ClassFile
 	 */
 	public function generateHeader()
 	{
-		$nameSpace = BizyStoreConfig::getAppName();
+		$config = $this->getConfig();
+		$nameSpace = $config->getModelNamespace();
 		$classFileContentsHeader = "<?php\n";
-		$classFileContentsHeader .= "\nnamespace bizySoft\\bizyStore\\model" . ($nameSpace ? "\\$nameSpace" : "") . ";";
+		$classFileContentsHeader .= "\nnamespace $nameSpace;\n";
 		$classFileContentsHeader .= "\nuse bizySoft\\bizyStore\\model\\core\\ModelSchema;";
-		$classFileContentsHeader .= "\nuse bizySoft\\bizyStore\\model\\core\\ModelException;";
-		$classFileContentsHeader .= "\nuse bizySoft\\bizyStore\\model\\core\\DB;";
-		$classFileContentsHeader .= "\nuse bizySoft\\bizyStore\\services\\core\\DBManager;\n\n";
+		$classFileContentsHeader .= "\nuse bizySoft\\bizyStore\\model\\core\\DB;\n\n";
 		$classFileContentsHeader .= self::$licenseContents . "\n";
 		
 		return $classFileContentsHeader;
@@ -57,7 +58,7 @@ class BizyStoreModelFile extends ClassFile
 	/**
 	 * Generate the class definition for the particular Model.
 	 *
-	 * Includes the properties and implementation methods necessary for bizyStore to provide database services.
+	 * Associates the Model with a particular Schema.
 	 *
 	 * @param ReferencedProperties $referencedProperties
 	 * @return string the class definition.
@@ -65,7 +66,7 @@ class BizyStoreModelFile extends ClassFile
 	public function generateDefinition(ReferencedProperties $referencedProperties = null)
 	{
 		$className = $this->className;
-		$classFileContents = "class " . $className . " extends ModelSchema\n{\n";
+		$classFileContents = "\nclass " . $className . " extends ModelSchema\n{\n";
 		
 		$compatibleIds = array_keys($this->schema);
 		
@@ -78,13 +79,7 @@ class BizyStoreModelFile extends ClassFile
 			"\t\t\t//Optimise execution time by synching schema only once per Model class\n" . 
 			"\t\t\tself::\$commonSchema = new " . $this->className . "Schema();\n" . 
 			"\t\t}\n\n" . 
-			"\t\t\$db = \$db ? \$db : DBManager::getDB(\"" . $compatibleIds[0] . "\");\n" . 
-			"\t\t\$dbId = \$db->getDBId();\n" . 
-			"\t\tif (!isset(self::\$commonSchema->compatibleDBIds[\$dbId]))\n" . 
-			"\t\t{\n" . 
-			"\t\t\tthrow new ModelException(__METHOD__.\" Model class is not compatible with database \$dbId\");\n" . 
-			"\t\t}\n" . 
-			"\t\tparent::__construct(\$properties ? \$properties : array(), \$db, self::\$commonSchema);\n" . 
+			"\t\tparent::__construct(\$properties ? \$properties : array(), self::\$commonSchema, \$db);\n" . 
 			"\t}\n" . 
 			"}\n";
 		

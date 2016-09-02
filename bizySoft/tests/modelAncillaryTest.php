@@ -1,9 +1,7 @@
 <?php
 namespace bizySoft\tests;
 
-use bizySoft\bizyStore\services\core\BizyStoreConfig;
 use bizySoft\bizyStore\services\core\BizyStoreLogger;
-use bizySoft\bizyStore\services\core\DBManager;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -14,7 +12,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelAncillaryTestCase extends ModelTestCase
 {
@@ -23,10 +21,12 @@ class ModelAncillaryTestCase extends ModelTestCase
 	 */
 	public function testGetSchema()
 	{
-		$ids = DBManager::getDBIds();
+		$config = self::getTestcaseConfig();
+		
+		$ids = array_keys($config->getDBConfig());
 		foreach ($ids as $id)
 		{
-			$db = DBManager::getDB($id);
+			$db = $config->getDB($id);
 			$tables = $db->getTableNames();
 			
 			foreach($tables as $tableName)
@@ -41,22 +41,22 @@ class ModelAncillaryTestCase extends ModelTestCase
 	
 	public function testAncillary()
 	{
-		$appName = BizyStoreConfig::getAppName();
-		$this->assertEquals("unitTest", $appName);
+		$config = self::getTestcaseConfig();
+		$configClass = $config->getProperty(self::BIZYSTORE_CONFIG_CLASS, true);
+		$this->assertEquals("UnitTestConfig", $configClass);
 		
-		$fileName = BizyStoreConfig::getFileName();
+		$fileName = $config->getProperty(self::CONFIG_FILE_NAME, true);
 		/*
-		 * Two possibilites here either the standard bizySoftConfig.xml or the specific unitTest file.
+		 * Two possibilites here, either the standard bizySoftConfig.xml or the specific unitTest file.
 		 * The standard one is used when the specific unitTest file does not exist.
 		 */
 		$this->assertTrue(strpos($fileName, "unitTest.xml") !== false || strpos($fileName, "bizySoftConfig.xml") !== false);
 		/*
 		 * Code coverage for Logger classes
 		 */
-		BizyStoreLogger::log("Code coverage for BizyStoreLogger");
-		$previous = TestLogger::logging(false);
+		$previous = $this->logger->logging(false);
 		$this->assertTrue($previous);
-		$previous = TestLogger::logging($previous);
+		$previous = $this->logger->logging($previous);
 		$this->assertFalse($previous);
 	}
 	

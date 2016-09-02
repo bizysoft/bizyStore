@@ -11,7 +11,7 @@ use bizySoft\bizyStore\model\statements\DeletePreparedStatement;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class OptimisticDelete extends OptimisticWrite
 {

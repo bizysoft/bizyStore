@@ -7,23 +7,23 @@ use bizySoft\bizyStore\model\statements\JoinPreparedStatement;
 use bizySoft\bizyStore\model\statements\UpdatePreparedStatement;
 
 /**
- * The Model class represents a database table and has access to database schema information for CRUD 
+ * The Model class represents a database table and provides methods for property manipulation and CRUD 
  * (Create, Read (Find), Update, Delete) functionality.
  * 
  * A Model object represents a row of data in a database table. The properties defined in a Model object 
  * represent columns in a table row. CRUD operations are based on Model objects. 
  * 
  * Generated Model classes hold the database connection and schema information. All database interactions are 
- * deferred to the generated class through interface methods.
+ * deferred to the generated class through the interface methods.
  *
  * <span style="color:orange">If you find our software helpful, the best way to contribute
  * is to hire us to work for you. </span> Details at <a href="http://www.bizysoft.com.au">http://www.bizysoft.com.au</a>
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class Model implements ModelOptions, ModelI, SchemaI
+abstract class Model implements ModelConstants, ModelI, SchemaI
 {
 	/**
 	 * The array of property names/values that model columns in a database table row.
@@ -303,7 +303,7 @@ abstract class Model implements ModelOptions, ModelI, SchemaI
 	 * Gets the Model's non-sequenced schema properties, either from itself or another set of properties perhaps related to 
 	 * this schema. 
 	 * 
-	 * Non-sequenced properties are those that are not automatically allocated by the database and therfore can be 
+	 * Non-sequenced properties are those identity fields that are not automatically allocated by the database and therfore can be 
 	 * used in an insert or update statement.
 	 *
 	 * @param array $properties the properties to use. Calling this method with no parameters will use the Model's properties.
@@ -833,6 +833,7 @@ abstract class Model implements ModelOptions, ModelI, SchemaI
 	 * @param string $resolvePath
 	 * @param array $properties
 	 * @param array $options
+	 * @return JoinPreparedStatement
 	 */
 	public function getJoinStatement($resolvePath, $properties = array(), $options = array())
 	{
@@ -906,6 +907,8 @@ abstract class Model implements ModelOptions, ModelI, SchemaI
 	
 	/**
 	 * Gets the dirty properties for persisted Models
+	 * 
+	 * @return array
 	 */
 	public function getDirty()
 	{
@@ -933,6 +936,8 @@ abstract class Model implements ModelOptions, ModelI, SchemaI
 	 * more than anything else. Some SPL functions may use this method.
 	 *
 	 * @param string $name
+	 * 
+	 * @return mixed
 	 */
 	public function __get($name)
 	{

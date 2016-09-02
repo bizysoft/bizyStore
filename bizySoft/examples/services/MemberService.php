@@ -2,7 +2,7 @@
 namespace bizySoft\examples\services;
 
 use bizySoft\bizyStore\model\core\DB;
-use bizySoft\bizyStore\model\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Member;
 use \Exception;
 
 /**
@@ -25,7 +25,7 @@ use \Exception;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class MemberService
 {

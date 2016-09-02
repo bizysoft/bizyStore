@@ -1,6 +1,9 @@
 <?php
 namespace bizySoft\bizyStore\model\statements;
 
+use bizySoft\bizyStore\model\core\ModelException;
+use bizySoft\bizyStore\model\core\SchemaConstants;
+
 /**
  * Supports the Create CRUD operation on Model objects.
  *
@@ -11,9 +14,9 @@ namespace bizySoft\bizyStore\model\statements;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-class CreatePreparedStatement extends CRUDPreparedStatement
+class CreatePreparedStatement extends CRUDPreparedStatement implements SchemaConstants
 {
 	/**
 	 * Construct a prepared statement using the Model object.
@@ -53,13 +56,43 @@ class CreatePreparedStatement extends CRUDPreparedStatement
 	 */
 	protected function buildStatement()
 	{
-		$properties = $this->properties;
+		/*
+		 * Guaranatee there will be properties.
+		 */
+		$properties = empty($this->properties) ? $this->getNullProperties() : $this->properties;
+
 		$statement = $this->statementBuilder->buildModelInsertStatement($this->modelObj->getTableName(), $properties);
 		$statement = $this->statementBuilder->translate($statement, $properties);
 		
 		$this->properties = $this->statementBuilder->translateProperties($properties);
 		
 		return $statement;
+	}
+	
+	/**
+	 * Do all we can to fill nullable properties with nulls.
+	 * 
+	 * This is a database/table agnostic way to allow an empty Model to be inserted into the database.
+	 * 
+	 * Under certain circumstances this may return an array that will fail in the query.
+	 * eg. null key properties or the Model totally consists of non-nullable properties 
+	 * in both cases those properties should be provided in the Model.
+	 * 
+	 * @returns array
+	 */
+	private function getNullProperties()
+	{
+		$nullProperties = array();
+		$schema = $this->modelObj->getColumnSchema();
+		foreach ($schema->get($this->modelObj->getDBId()) as $key => $columnProps)
+		{
+			if (isset($columnProps[self::IS_NULLABLE]) && $columnProps[self::IS_NULLABLE])
+			{
+				$nullProperties[$key] = null;
+			}
+		}
+		ksort($nullProperties);
+		return $this->modelObj->getNonSequencedProperties($nullProperties);
 	}
 }
 ?>

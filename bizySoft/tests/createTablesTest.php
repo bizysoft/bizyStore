@@ -2,10 +2,7 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\generator\ModelGenerator;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
-use bizySoft\bizyStore\services\core\ConnectionManager;
-use bizySoft\bizyStore\services\core\DBManager;
-use bizySoft\bizyStore\model\unitTest\TestTable;
+use bizySoft\bizyStore\app\unitTest\TestTable;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -16,14 +13,16 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class CreateTablesTestCase extends ModelTestCase
 {
 
 	public function testCreateTables()
 	{
-		$dbConfigs = ConnectionManager::getDBConfig();
+		$config = self::getTestcaseConfig();
+		
+		$dbConfigs = $config->getDBConfig();
 		$dbId = null;
 		foreach($dbConfigs as $dbConfig)
 		{
@@ -34,9 +33,9 @@ class CreateTablesTestCase extends ModelTestCase
 			 * We want to test that we can dynamically create a table and have it recognised 
 			 * in bizyStore's Schema.
 			 */
-			if ($dbConfig[BizyStoreOptions::DB_INTERFACE_TAG] == "SQLite")
+			if ($dbConfig[self::DB_INTERFACE_TAG] == "SQLite")
 			{
-				$dbId = $dbConfig[BizyStoreOptions::DB_ID_TAG];
+				$dbId = $dbConfig[self::DB_ID_TAG];
 				break;
 			}
 		}
@@ -46,7 +45,7 @@ class CreateTablesTestCase extends ModelTestCase
 			$txn = null;
 			try 
 			{
-				$db = DBManager::getDB($dbId);
+				$db = $config->getDB($dbId);
 				
 				$createTableStatement =
 				"CREATE TABLE testTable (
@@ -78,7 +77,7 @@ class CreateTablesTestCase extends ModelTestCase
 				 * 
 				 * The following technique can be used to generate/re-generate the schema if required on any particular $db/table(s).
 				 */
-				$generator = new ModelGenerator();
+				$generator = new ModelGenerator($db->getConfig());
 				$generator->generate(array($dbId => array("testTable")));
 				/*
 				 * Done, now we have full Model/Schema support...
@@ -119,13 +118,13 @@ class CreateTablesTestCase extends ModelTestCase
 				}
 				
 				/*
-				 * Delete the table, it was only a test. Schema files are still available in /bizySoft/bizyStore/model/unitTest.
+				 * Delete the table, it was only a test. Schema files are still available in /bizySoft/bizyStore/app/unitTest.
 				 */
 				$txn->rollBack();
 			}
 			catch (Exception $e)
 			{
-				TestLogger::log(__METHOD__ . ": " . $e->getMessage());
+				$this->logger->log(__METHOD__ . ": " . $e->getMessage());
 				if ($txn)
 				{
 					$txn->rollBack();

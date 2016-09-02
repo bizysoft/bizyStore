@@ -14,7 +14,7 @@ namespace bizySoft\common;
  * 
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class Option
 {
@@ -30,6 +30,12 @@ class Option
 	 */
 	public $value = null;
 
+	/**
+	 * Sets the class variables.
+	 * 
+	 * @param string $key
+	 * @param mixed $value
+	 */
 	public function __construct($key, $value)
 	{
 		$this->key = $key;

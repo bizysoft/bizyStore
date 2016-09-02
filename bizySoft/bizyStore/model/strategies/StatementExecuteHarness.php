@@ -13,7 +13,7 @@ use bizySoft\bizyStore\model\core\StatementException;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class StatementExecuteHarness extends StatementAccessHarness
 {
@@ -31,6 +31,7 @@ class StatementExecuteHarness extends StatementAccessHarness
 	 * Harness the database access and provide some fault tolerance.
 	 *
 	 * @param callable $closure
+	 * @return mixed
 	 * @throws ModelException
 	 */
 	public function harness($closure)

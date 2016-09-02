@@ -15,7 +15,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelQueryStatementTestCase extends ModelTestCase
 {
@@ -78,7 +78,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 		$this->runTransactionOnAllDatabasesAndTables(function ($db, $outerTxn, $className) 
 		{
 			$builder = new StatementBuilder($db);
-			TestLogger::startTimer("$className stdClass");
+			$this->logger->startTimer("$className stdClass");
 			$options = array(
 					Statement::OPTION_CLASS_NAME => "\\stdClass" 
 			);
@@ -103,11 +103,11 @@ class ModelQueryStatementTestCase extends ModelTestCase
 			}
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
 				
-			TestLogger::stopTimer("$className stdClass");
+			$this->logger->stopTimer("$className stdClass");
 			/*
 			 * Now test the existing statement to see if we can call assocSet()
 			 */
-			TestLogger::startTimer("$className existing arraySet");
+			$this->logger->startTimer("$className existing arraySet");
 			$members = $queryStatement->assocSet();
 			$this->assertEquals(ModelTestCase::ITERATIONS, count($members));
 			foreach ($members as $i => $member)
@@ -129,7 +129,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 							$db 
 					) 
 			);
-			TestLogger::startTimer("$className Model");
+			$this->logger->startTimer("$className Model");
 			$queryStatement = new QueryStatement($db, $selectQuery, $options);
 			$members = $queryStatement->objectSet();
 			$this->assertEquals(ModelTestCase::ITERATIONS, count($members));
@@ -145,8 +145,8 @@ class ModelQueryStatementTestCase extends ModelTestCase
 				$diff = array_diff_assoc($formData, $dbData);
 				$this->assertTrue(empty($diff));
 			}	
-			TestLogger::stopTimer("$className Model");
-			TestLogger::stopTimer("$className existing arraySet");
+			$this->logger->stopTimer("$className Model");
+			$this->logger->stopTimer("$className existing arraySet");
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
 		});
 	}
@@ -162,7 +162,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 		$method = __METHOD__;
 		$this->runTransactionOnAllDatabasesAndTables(function ($db, $outerTxn, $className) use($method) 
 		{
-			TestLogger::startTimer("$method: $className");
+			$this->logger->startTimer("$method: $className");
 			$builder = new StatementBuilder($db);
 			/*
 			 * Specify a class in the $options to get back a stdClass object result set
@@ -181,7 +181,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 			$tableName = $modelObj->getTableName();
 			$query = "SELECT * FROM <Q{$tableName}Q> order by <ElastNameE>";
 			$selectQuery = $builder->translate($query);
-			TestLogger::startTimer("$className objectIterator");
+			$this->logger->startTimer("$className objectIterator");
 			$queryStatement = new QueryStatement($db, $selectQuery, $options);
 			foreach ($queryStatement->iterator() as $i => $member)
 			{
@@ -191,7 +191,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 				$diff = array_diff_assoc($formData, $dbData);
 				$this->assertTrue(empty($diff));
 			}
-			TestLogger::stopTimer("$className objectIterator");
+			$this->logger->stopTimer("$className objectIterator");
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
 			/*
 			 * We won't specify any options this time so we expect back an array result set.
@@ -203,7 +203,7 @@ class ModelQueryStatementTestCase extends ModelTestCase
 			$query = "SELECT * FROM <Q{$tableName}Q> WHERE <EfirstNameE> = <PfirstNameP> order by <ElastNameE>";
 			$selectQuery = $builder->translate($query, $properties);
 			$queryStatement = new QueryStatement($db, $selectQuery);
-			TestLogger::startTimer("$className arrayIterator");
+			$this->logger->startTimer("$className arrayIterator");
 			foreach ($queryStatement->iterator() as $i => $member)
 			{
 				$formData["lastName"] = "name_" . sprintf(ModelTestCase::SUFFIX_FORMAT, $i);
@@ -212,12 +212,12 @@ class ModelQueryStatementTestCase extends ModelTestCase
 				$this->assertTrue(empty($diff));
 			}
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
-			TestLogger::stopTimer("$className arrayIterator");
+			$this->logger->stopTimer("$className arrayIterator");
 			/*
 			 * Grab another iterator from the same QueryStatement
 			 * to see if we can cleanly iterate again.
 			 */
-			TestLogger::startTimer("$className arrayIterator2");
+			$this->logger->startTimer("$className arrayIterator2");
 			$iterator = $queryStatement->iterator();
 			foreach ($iterator as $i => $member)
 			{
@@ -228,11 +228,11 @@ class ModelQueryStatementTestCase extends ModelTestCase
 			}
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
 			$this->assertEquals(ModelTestCase::ITERATIONS, $iterator->count());
-			TestLogger::stopTimer("$className arrayIterator2");
+			$this->logger->stopTimer("$className arrayIterator2");
 			/*
 			 * Grab the same iterator and check if we can still cleanly iterate.
 			 */
-			TestLogger::startTimer("$className arrayIterator3");
+			$this->logger->startTimer("$className arrayIterator3");
 			foreach ($iterator as $i => $member)
 			{
 				$formData["lastName"] = "name_" . sprintf(ModelTestCase::SUFFIX_FORMAT, $i);
@@ -242,8 +242,8 @@ class ModelQueryStatementTestCase extends ModelTestCase
 			}
 			$this->assertEquals(ModelTestCase::ITERATIONS, $i+1);
 			$this->assertEquals(ModelTestCase::ITERATIONS, $iterator->count());
-			TestLogger::stopTimer("$className arrayIterator3");
-			TestLogger::stopTimer("$method: $className");
+			$this->logger->stopTimer("$className arrayIterator3");
+			$this->logger->stopTimer("$method: $className");
 		});
 	}
 }

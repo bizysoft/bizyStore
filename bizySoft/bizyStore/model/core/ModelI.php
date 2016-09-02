@@ -12,7 +12,7 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 interface ModelI
 {
@@ -38,6 +38,13 @@ interface ModelI
 	public function getDefaultDBId();
 	
 	/**
+	 * Gets the database that this Model has as a default
+	 *
+	 * @return DB
+	 */
+	public function getDefaultDB();
+	
+/**
 	 * Gets the database Id's that this Model is compatible with
 	 *
 	 * @return string

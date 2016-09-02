@@ -1,6 +1,9 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
+use bizySoft\bizyStore\services\core\BizyStoreConstants;
+use bizySoft\bizyStore\services\core\Config;
+
 /**
  * Abstract base class specifying behaviour used for generating the Model and Schema class files.
  *
@@ -11,10 +14,28 @@ namespace bizySoft\bizyStore\generator;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
-abstract class ClassFile
+abstract class ClassFile implements BizyStoreConstants
 {
+	private static $config = null;
+	
+	public function __construct(Config $config = null)
+	{
+		if (!self::$config && $config)
+		{
+			self::$config = $config;
+		}
+	}
+	
+	/**
+	 * Gets the application's config
+	 * @return Config
+	 */
+	protected function getConfig()
+	{
+		return self::$config;
+	}
 	/**
 	 * Licence info per file.
 	 *
@@ -22,13 +43,6 @@ abstract class ClassFile
 	 */
 	protected static $licenseContents = "/**
  * Generated code. Don't edit.
- *
- * If you find our software helpful, the best way to contribute is to
- * hire us to work for you. Details at http://www.bizysoft.com.au.
- *
- * @author bizySoft/bizyStore/generator/ModelGenerator.php, http://www.bizysoft.com.au
- * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
  */";
 	
 	/**

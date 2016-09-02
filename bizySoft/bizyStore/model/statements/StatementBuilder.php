@@ -1,7 +1,7 @@
 <?php
 namespace bizySoft\bizyStore\model\statements;
 
-use bizySoft\bizyStore\model\core\DB;
+use bizySoft\bizyStore\model\core\PDODB;
 use bizySoft\bizyStore\model\core\ModelException;
 /**
  * Provides generic methods for building database queries.
@@ -13,7 +13,7 @@ use bizySoft\bizyStore\model\core\ModelException;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class StatementBuilder
 {
@@ -27,7 +27,7 @@ class StatementBuilder
 	/**
 	 * The database reference
 	 * 
-	 * @var DB
+	 * @var PDODB
 	 */
 	protected $db;
 	
@@ -78,9 +78,9 @@ class StatementBuilder
 	/**
 	 * Set up the db and translators.
 	 *
-	 * @param DB $db
+	 * @param PODDB $db
 	 */
-	public function __construct(DB $db)
+	public function __construct(PDODB $db)
 	{
 		$this->db = $db;
 		
@@ -96,7 +96,6 @@ class StatementBuilder
 	 * Set the where clause indicator.
 	 * 
 	 * @param boolean $yesNo
-	 * @return boolean
 	 */
 	public function hasWhere($yesNo)
 	{
@@ -164,7 +163,7 @@ class StatementBuilder
 			return "($columnNames) VALUES ($columnValues)";
 		}
 		
-		return array();
+		return "";
 	}
 
 	/**
@@ -322,7 +321,15 @@ class StatementBuilder
 
 		foreach (self::$prefixes as $key => $prefix)
 		{
-			$suffix = self::$suffixes[$key];
+			if (strpos($taggedSQL, $prefix) === false)
+			{
+				/*
+				 * This is the fastest way to determine if we have a tagged entity that
+				 * needs replacement, before we call regex un-necessarily.
+				 */
+				continue;
+			}
+				
 			/*
 			 * Get all the matches for a string between the tags specified.
 			 * 
@@ -330,6 +337,7 @@ class StatementBuilder
 			 * The corresponding sub-pattern matches between the tags (eg. membership) are returned into $parsed[$key][1]. 
 			 * Sub-pattern matches are specified by parentheses in the regex string below.
 			 */
+			$suffix = self::$suffixes[$key];
 			$regex = "/$prefix([a-zA-Z0-9_]*)$suffix/";
 			$matched = array();
 			preg_match_all($regex, $taggedSQL, $matched);
@@ -368,7 +376,9 @@ class StatementBuilder
 	}
 	
 	/**
-	 * Takes a raw text tagged statement and augments tagged entity fields with an alias.
+	 * Takes a raw text tagged statement and augments tagged ENTITY (<E..E>) fields with an alias.
+	 * 
+	 * This is typically used internally for appending control functions like 'order by' and 'limit' to a JoinStatement.
 	 *
 	 * @param string $sql the tagged sql
 	 * @param string $alias the alias to augment with.
@@ -382,8 +392,7 @@ class StatementBuilder
 		 * Get all the entity matches for a string between the tags specified.
 		 *
 		 * Full regex matches (eg. <EfirstNameE>) are returned into $parsed[0].
-		 * The corresponding sub-pattern matches between the tags (eg. firstName) are returned into $parsed[1].
-		 * Sub-pattern matches are specified by parentheses in the regex string below.
+		 * Sub-pattern matches are ignored because we only want to augment the entity tags with an alias.
 		 */
 		$regex = "/<E([a-zA-Z0-9_]*)E>/";
 		preg_match_all($regex, $sql, $parsed);
@@ -420,6 +429,7 @@ class StatementBuilder
 	 *
 	 * @param string $statement
 	 * @param string $appendPortion
+	 * @return string
 	 */
 	public function append($statement, $appendPortion)
 	{

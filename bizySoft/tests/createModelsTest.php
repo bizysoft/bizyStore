@@ -12,7 +12,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class CreateModelsTestCase extends ModelTestCase
 {
@@ -31,8 +31,8 @@ class CreateModelsTestCase extends ModelTestCase
 			$classNames = self::getTestClasses();
 			foreach ($classNames as $className)
 			{
-				TestLogger::log("Instantiating $iterations $className");
-				TestLogger::startTimer("Add timer");
+				$this->logger->log("Instantiating $iterations $className");
+				$this->logger->startTimer("Add timer");
 				for ($i = 0; $i < $iterations; $i++)
 				{
 					$model = new $className($formData, $db);
@@ -47,11 +47,11 @@ class CreateModelsTestCase extends ModelTestCase
 					$bulkCreator->add($model);
 					$createCount++;
 				}
-				TestLogger::stopTimer("Add timer");
+				$this->logger->stopTimer("Add timer");
 			}
 		});
 		$noCreated = $bulkCreator->excecute();
-		TestLogger::log("Created $noCreated models");
+		$this->logger->log("Created $noCreated models");
 		$this->assertEquals($createCount, $noCreated);
 		/*
 		 * Now do a real test to see if we have actually created everything in all databases

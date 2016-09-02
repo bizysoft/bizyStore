@@ -12,7 +12,7 @@ use bizySoft\bizyStore\model\statements\Statement;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ObjectSetFetchStrategy extends DBAccessStrategy
 {
@@ -36,7 +36,7 @@ class ObjectSetFetchStrategy extends DBAccessStrategy
 	 * Note that this method will use the magic _set method to set the properties BEFORE the constructor for the
 	 * object is called.
 	 *
-	 * @see \bizySoft\bizyStore\model\statements\DBAccessStrategyI::execute()
+	 * @return array
 	 */
 	public function execute($properties = array())
 	{

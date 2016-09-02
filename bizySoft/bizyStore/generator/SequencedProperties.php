@@ -1,12 +1,10 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\SchemaI;
-
 /**
  * Store sequence information about a table based on a database id. 
  * 
- * 'sequenced' columns are a general term here, they are fields that the database automatically 
+ * 'sequenced' columns are a general term here, they are identity fields that the database automatically 
  * allocates when you insert a table row. Usually they occur with a primary key declaration but not 
  * necessarily. See ModelI::getSchemaSequences().
  * 
@@ -21,11 +19,15 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class SequencedProperties extends SchemaProperties
 {
-	
+	/**
+	 * Transform the sequenced data into the required form for code generation.
+	 * 
+	 * @return array
+	 */
 	private function transform()
 	{
 		$sequencedProperties = array();
@@ -36,8 +38,8 @@ class SequencedProperties extends SchemaProperties
 		{
 			foreach($columnSchema as $columnProperties)
 			{
-				$columnName = $columnProperties[SchemaI::COLUMN_NAME];
-				$sequenceName = $columnProperties[SchemaI::SEQUENCE_NAME];
+				$columnName = $columnProperties[self::COLUMN_NAME];
+				$sequenceName = $columnProperties[self::SEQUENCE_NAME];
 		
 				if(!isset($sequencedProperties[$dbId]))
 				{
@@ -50,10 +52,11 @@ class SequencedProperties extends SchemaProperties
 		
 		return $sequencedProperties;
 	}
+	
 	/**
 	 * Add the required sequenceName keyed on columName. The sequence name can be null.
 	 * 
-	 * @see \bizySoft\bizyStore\generator\SchemaProperties::add()
+	 * @return string
 	 */
 	public function codify()
 	{
@@ -65,7 +68,7 @@ class SequencedProperties extends SchemaProperties
 	/**
 	 * Generate the code to support sequenced columns for a database table keyed on the dbId.
 	 * 
-	 * @see \bizySoft\bizyStore\generator\SchemaProperties::codify()
+	 * @return string
 	 */
 	public function stringify(array $sequencedProperties)
 	{
@@ -93,6 +96,8 @@ class SequencedProperties extends SchemaProperties
 	
 	/**
 	 * Gets the sequenced key candidates for a database table keyed on the dbId.
+	 * 
+	 * @return array
 	 */
 	public function keyCandidates()
 	{

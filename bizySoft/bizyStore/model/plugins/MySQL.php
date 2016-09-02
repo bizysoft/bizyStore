@@ -2,7 +2,6 @@
 namespace bizySoft\bizyStore\model\plugins;
 
 use \PDO;
-use bizySoft\bizyStore\services\core\BizyStoreOptions;
 use bizySoft\bizyStore\services\core\Connector;
 
 /**
@@ -34,7 +33,7 @@ use bizySoft\bizyStore\services\core\Connector;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class MySQL extends Connector
 {
@@ -71,16 +70,16 @@ class MySQL extends Connector
 		 * Mandatory fields.
 		 * These are validated when read from the config file and are guaranteed to exist.
 		 */
-		$dbName = $dbConfig[BizyStoreOptions::DB_NAME_TAG];
-		$dbUser = $dbConfig[BizyStoreOptions::DB_USER_TAG];
-		$dbPassword = $dbConfig[BizyStoreOptions::DB_PASSWORD_TAG];
+		$dbName = $dbConfig[self::DB_NAME_TAG];
+		$dbUser = $dbConfig[self::DB_USER_TAG];
+		$dbPassword = $dbConfig[self::DB_PASSWORD_TAG];
 		/*
 		 * Optional fields.
 		 */
-		$dbHost = isset($dbConfig[BizyStoreOptions::DB_HOST_TAG]) ? $dbConfig[BizyStoreOptions::DB_HOST_TAG] : "";
-		$dbPort = isset($dbConfig[BizyStoreOptions::DB_PORT_TAG]) ? $dbConfig[BizyStoreOptions::DB_PORT_TAG] : "";
-		$dbOptions = isset($dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG]) ? $dbConfig[BizyStoreOptions::PDO_OPTIONS_TAG] : null;
-		$dbSocket = isset($dbConfig[BizyStoreOptions::DB_SOCKET_TAG]) ? $dbConfig[BizyStoreOptions::DB_SOCKET_TAG] : null;
+		$dbHost = isset($dbConfig[self::DB_HOST_TAG]) ? $dbConfig[self::DB_HOST_TAG] : "";
+		$dbPort = isset($dbConfig[self::DB_PORT_TAG]) ? $dbConfig[self::DB_PORT_TAG] : "";
+		$dbOptions = isset($dbConfig[self::PDO_OPTIONS_TAG]) ? $dbConfig[self::PDO_OPTIONS_TAG] : null;
+		$dbSocket = isset($dbConfig[self::DB_SOCKET_TAG]) ? $dbConfig[self::DB_SOCKET_TAG] : null;
 	
 		if ($dbSocket)
 		{
@@ -93,8 +92,8 @@ class MySQL extends Connector
 		{
 			$dsn .= ($dbHost ? "host=$dbHost;" : "") . "dbname=$dbName;" . ($dbPort ? "dbport=$dbPort;" : "");
 		}
-		$dbUser = isset($dbConfig[BizyStoreOptions::DB_USER_TAG]) ? $dbConfig[BizyStoreOptions::DB_USER_TAG] : "";
-		$dbPassword = isset($dbConfig[BizyStoreOptions::DB_PASSWORD_TAG]) ? $dbConfig[BizyStoreOptions::DB_PASSWORD_TAG] : "";
+		$dbUser = isset($dbConfig[self::DB_USER_TAG]) ? $dbConfig[self::DB_USER_TAG] : "";
+		$dbPassword = isset($dbConfig[self::DB_PASSWORD_TAG]) ? $dbConfig[self::DB_PASSWORD_TAG] : "";
 		/*
 		 * Connect to the database
 		 */
@@ -102,7 +101,7 @@ class MySQL extends Connector
 		/*
 		 * Set up the charset
 		 */
-		$dbCharset = isset($dbConfig[BizyStoreOptions::DB_CHARSET_TAG]) ? $dbConfig[BizyStoreOptions::DB_CHARSET_TAG] : "utf8mb4";
+		$dbCharset = isset($dbConfig[self::DB_CHARSET_TAG]) ? $dbConfig[self::DB_CHARSET_TAG] : "utf8mb4";
 		$charsetQuery = "set names '$dbCharset'";
 		$db->exec($charsetQuery);
 	

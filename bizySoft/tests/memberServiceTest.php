@@ -2,10 +2,9 @@
 namespace bizySoft\tests;
 
 use bizySoft\bizyStore\model\core\ModelException;
-use bizySoft\bizyStore\model\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Member;
 use bizySoft\bizyStore\model\core\PDODB;
 use bizySoft\bizyStore\model\core\Model;
-use bizySoft\bizyStore\services\core\DBManager;
 use bizySoft\examples\services\MemberService;
 use bizySoft\tests\services\TestLogger;
 
@@ -17,7 +16,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class MemberServiceTestCase extends ModelTestCase
 {
@@ -28,9 +27,10 @@ class MemberServiceTestCase extends ModelTestCase
 	public function testMemberServices()
 	{
 		$db = null;
+		$config = self::getTestcaseConfig();
 		try
 		{
-			$db = DBManager::getDB();
+			$db = $config->getDB();
 			$createDate = $db->getConstantDateTime();
 			$formData = $this->formData->getJackFormData();
 			$formData["dateCreated"] = $createDate;
@@ -109,7 +109,7 @@ class MemberServiceTestCase extends ModelTestCase
 		catch ( ModelException $e )
 		{
 			$message = __METHOD__ . "Test Exception = " . $e->getMessage();
-			TestLogger::log($message);
+			$this->logger->log($message);
 			if ($db)
 			{
 				// commit here in case we want to look at the test database

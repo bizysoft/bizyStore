@@ -1,11 +1,11 @@
 <?php
 namespace bizySoft\tests;
 
-use bizySoft\bizyStore\model\unitTest\Member;
-use bizySoft\bizyStore\model\unitTest\Membership;
-use bizySoft\bizyStore\model\unitTest\MemberView;
-use bizySoft\bizyStore\model\unitTest\MembershipView;
-use bizySoft\bizyStore\model\unitTest\MembershipViewSchema;
+use bizySoft\bizyStore\app\unitTest\Member;
+use bizySoft\bizyStore\app\unitTest\Membership;
+use bizySoft\bizyStore\app\unitTest\MemberView;
+use bizySoft\bizyStore\app\unitTest\MembershipView;
+use bizySoft\bizyStore\app\unitTest\MembershipViewSchema;
 use bizySoft\tests\services\TestLogger;
 
 /**
@@ -16,7 +16,7 @@ use bizySoft\tests\services\TestLogger;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ModelViewTestCase extends ModelTestCase
 {
@@ -123,9 +123,9 @@ class ModelViewTestCase extends ModelTestCase
 				 * Realise a new jack for the view, keep the old one to compare
 				 */
 				$realiseJack = new MemberView($jacksId, $db);
-				TestLogger::startTimer("realise MemberView");
+				$this->logger->startTimer("realise MemberView");
 				$jackArray = $realiseJack->realise(1); // Realise 1 hop from the parent
-				TestLogger::stopTimer("realise MemberView");
+				$this->logger->stopTimer("realise MemberView");
 				$this->assertEquals(1, count($jackArray));
 				$jackRealised = reset($jackArray);
 				$this->assertEquals($jack->getSchemaProperties(), $jackRealised->getSchemaProperties());

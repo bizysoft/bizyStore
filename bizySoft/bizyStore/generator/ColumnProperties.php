@@ -1,8 +1,6 @@
 <?php
 namespace bizySoft\bizyStore\generator;
 
-use bizySoft\bizyStore\model\core\SchemaI;
-
 /**
  * Store column meta-data and generate code for a table's schema class file to support CRUD operations on databases.
  * 
@@ -14,7 +12,7 @@ use bizySoft\bizyStore\model\core\SchemaI;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class ColumnProperties extends SchemaProperties
 {
@@ -25,11 +23,11 @@ class ColumnProperties extends SchemaProperties
 	 * @var array
 	 */
 	private static $codifiedMetaData = array(
-			SchemaI::DATA_TYPE
-			,SchemaI::MAX_LENGTH
-			//,SchemaI::ORDINAL_POSITION
-			//,SchemaI::IS_NULLABLE
-			//,SchemaI::COLUMN_DEFAULT
+			self::DATA_TYPE
+			,self::MAX_LENGTH
+			//,self::ORDINAL_POSITION
+			,self::IS_NULLABLE
+			//,self::COLUMN_DEFAULT
 	);
 	
 	/**
@@ -50,7 +48,7 @@ class ColumnProperties extends SchemaProperties
 		{
 			foreach($columnSchema as $columnProperties)
 			{
-				$columnName = $columnProperties[SchemaI::COLUMN_NAME];
+				$columnName = $columnProperties[self::COLUMN_NAME];
 		
 				if(!isset($allColumnProperties[$dbId]))
 				{

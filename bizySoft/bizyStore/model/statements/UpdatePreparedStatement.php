@@ -2,6 +2,7 @@
 namespace bizySoft\bizyStore\model\statements;
 
 use bizySoft\bizyStore\model\core\Model;
+use bizySoft\bizyStore\model\core\ModelException;
 
 /**
  * Concrete class for updating Model objects in the database.
@@ -13,7 +14,7 @@ use bizySoft\bizyStore\model\core\Model;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 class UpdatePreparedStatement extends CRUDPreparedStatement
 {
@@ -94,6 +95,10 @@ class UpdatePreparedStatement extends CRUDPreparedStatement
 	{
 		$statement = $this->statementBuilder->buildModelUpdateStatement($this->modelObj->getTableName(), 
 		                                                                $this->setClauseKeys, $this->whereClauseProperties);
+		if (!$statement)
+		{
+			throw new ModelException("No properties defined.");
+		}
 		$statement = isset($options[Model::OPTION_APPEND_CLAUSE]) ?
 				$this->statementBuilder->append($statement, $options[Model::OPTION_APPEND_CLAUSE]) : $statement;
 		

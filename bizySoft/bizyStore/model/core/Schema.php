@@ -32,7 +32,7 @@ namespace bizySoft\bizyStore\model\core;
  *
  * @author Chris Maude, chris@bizysoft.com.au
  * @copyright Copyright (c) 2016, bizySoft
- * @license  See the LICENSE file with this distribution.
+ * @license LICENSE MIT License
  */
 abstract class Schema
 {
@@ -74,7 +74,7 @@ abstract class Schema
 	 * 
 	 * @param string $dbId
 	 * @param string $property
-	 * @return bool
+	 * @return boolean
 	 */
 	public function is($dbId, $property)
 	{
@@ -102,6 +102,7 @@ abstract class Schema
 	 *
 	 * @param array $masterKeySet the array of keys in this schema for a particular db. You can get this via get($dbId).
 	 * @param array $keys
+	 * @return boolean
 	 */
 	public function keyExists(array $masterKeySet, array $keys)
 	{
