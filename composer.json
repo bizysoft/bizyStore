@@ -1,0 +1,16 @@
+{
+    "name": "bizysoft/bizystore",
+    "description": "Object interface for databases",
+    "type": "project",
+    "license": "MIT",
+    "homepage": "http://github.com/bizysoft/bizyStore",
+    "authors": [
+        {
+            "name": "Chris Maude",
+            "email": "chris@bizysoft.com.au"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    }
+}
